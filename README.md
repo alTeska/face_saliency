@@ -1,4 +1,4 @@
-# NISE_saliency
+﻿# NISE_saliency
 ## Multiple feature saliency model development and human data verification.
 Testing multiple architectures and features and their influence in human saliency/attention model.
 
@@ -23,3 +23,5 @@ Additional optional features:
 4) Histogram-based classification (Histogram Intersection) [6]
 5) Motion detection (Frame differencing, MOG, MOG2) [6]
 6) Motion tracking (Particle filter) [6]
+
+Meaningless sentence.

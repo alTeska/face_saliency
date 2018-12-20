@@ -1,3 +1,5 @@
+# development file, later on itti&koch class 
+
 import math
 import numpy as np
 import scipy.signal as signal

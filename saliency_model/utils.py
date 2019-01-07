@@ -30,10 +30,16 @@ def plotFilter(fun):
 
 
 def downsample_image(image, min_height, min_width, scaling_factors):
-    '''Downsamples the image to a smaller map size, while keeping the third dimension as it is.
+    '''
+    Downsamples the image to a smaller map size, while keeping the third dimension as it is.
     Returns a list of downsampled images with a length according to input scalars.
-    Scaling factors have to be integers!'''
+    Scaling factors have to be integers!
+    '''
     img_maps = []
+
     for scalar in scaling_factors:
-        img_maps.append(transform.resize(image, ((min_height * scalar), (min_width * scalar)), mode='constant', anti_aliasing=True))
+        img_maps.append(transform.resize(image, ((min_height * scalar),
+                                         (min_width * scalar)), mode='constant',
+                                         anti_aliasing=True))
+
     return img_maps

@@ -1,4 +1,4 @@
-# development file, later on itti&koch class 
+# development file, later on itti&koch class
 
 import math
 import numpy as np
@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 import cv2
-import saliency_model.utils
+# import saliency_model.utils
+from utils import receptiveFieldMatrix, mexicanHat, downsample_image
 
 # Load The Image
 img = mpimg.imread('./imgs/balloons.png')
@@ -37,9 +38,11 @@ img_list = downsample_image(img, mapheight, mapwidth, scalars)
 
 
 # sum together maps across channels
-fig, ax = plt.subplot(nrow=1, ncol=3)
-
-ax[0] = plt.imshow(img[:,:,0])
+# fig, ax = plt.subplot(nrows=1, ncols=3)
+# ax[0] = plt.imshow(img[:,:,0])
+#
+# plt.figure()
+# plt.imshow(img[:,:,0])
 
 plt.figure()
 plt.imshow(img)

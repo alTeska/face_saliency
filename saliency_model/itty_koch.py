@@ -9,6 +9,7 @@ import matplotlib.image as mpimg
 import cv2
 # import saliency_model.utils
 from utils import receptiveFieldMatrix, mexicanHat, downsample_image
+from itti_koch_features import *
 
 # Load The Image
 img = mpimg.imread('./imgs/balloons.png')
@@ -29,7 +30,7 @@ scalars = [1, 2, 3]
 img_list = downsample_image(img, mapheight, mapwidth, scalars)
 
 # split to channels & compute salience in each
-
+img_int = compute_intensity(img_list)
 
 # each channel apply the center surround
 

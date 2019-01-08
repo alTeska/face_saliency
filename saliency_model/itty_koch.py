@@ -5,7 +5,7 @@ import scipy.signal as signal
 import matplotlib.image as mpimg
 
 from .utils import receptive_field_matrix, mexican_hat, downsample_image
-from itti_koch_features import *
+from .itti_koch_features import *
 
 
 class IttiKoch():
@@ -21,10 +21,10 @@ class IttiKoch():
         pass
 
     def run(self):
-        img = self.img[:,:,0]
+        img = self.img
 
         # convert to double if image is uint8
-        img_hat = signal.convolve(img, receptive_field_matrix(lambda x,y: mexican_hat(x,y,2,3)), mode='same')
+        img_hat = signal.convolve(img[:,:,0], receptive_field_matrix(lambda x,y: mexican_hat(x,y,2,3)), mode='same')
 
         # determine size and number of Center scales
         mapwidth = 64
@@ -40,11 +40,7 @@ class IttiKoch():
 
         # normalize channels
 
-
         # sum together maps across channels
-        # fig, ax = plt.subplot(1, 3)
-        #
-        # ax[0] = plt.imshow(img[:,:,0])
 
 
-        return img_hat, img_list
+        return img_list, img_int

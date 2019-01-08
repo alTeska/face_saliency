@@ -1,4 +1,4 @@
-# development file, later on itti&koch class 
+# development file, later on itti&koch class
 
 import math
 import numpy as np
@@ -7,29 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 import cv2
-
-def gaussian2D(x, y, sigma):
-    return (1.0/(1*math.pi*(sigma**2)))*math.exp(-(1.0/(2*(sigma**2)))*(x**2 + y**2))
-
-def mexicanHat(x,y,sigma1,sigma2):
-    return gaussian2D(x,y,sigma1) - gaussian2D(x,y,sigma2)
-
-def receptiveFieldMatrix(func):
-    """make matrix from function"""
-    h = 30
-    g = np.zeros((h,h))
-    for xi in range(0,h):
-        for yi in range(0,h):
-            x = xi-h/2
-            y = yi-h/2
-            g[xi, yi] = func(x,y);
-    return g
-
-def plotFilter(fun):
-    g = receptiveFieldMatrix(fun)
-    plt.imshow(g, cmap=cm.Greys_r)
-
-
+# import saliency_model.utils
+from utils import receptiveFieldMatrix, mexicanHat, downsample_image
 
 # Load The Image
 img = mpimg.imread('./imgs/balloons.png')
@@ -43,7 +22,11 @@ img = img[:,:,0]
 img_hat = signal.convolve(img, receptiveFieldMatrix(lambda x,y: mexicanHat(x,y,2,3)), mode='same')
 
 # determine size and number of Center scales
+mapwidth = 64
+mapheight = round(img.shape[0] * (mapwidth / img.shape[1]))
+scalars = [1, 2, 3]
 
+img_list = downsample_image(img, mapheight, mapwidth, scalars)
 
 # split to channels & compute salience in each
 
@@ -55,9 +38,11 @@ img_hat = signal.convolve(img, receptiveFieldMatrix(lambda x,y: mexicanHat(x,y,2
 
 
 # sum together maps across channels
-fig, ax = plt.subplot(nrow=1, ncol=3)
-
-ax[0] = plt.imshow(img[:,:,0])
+# fig, ax = plt.subplot(nrows=1, ncols=3)
+# ax[0] = plt.imshow(img[:,:,0])
+#
+# plt.figure()
+# plt.imshow(img[:,:,0])
 
 plt.figure()
 plt.imshow(img)

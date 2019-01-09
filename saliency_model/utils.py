@@ -5,14 +5,16 @@ import skimage.transform as transform
 
 
 def gaussian2D(x, y, sigma):
+    '''create 2D Gaussian distribution'''
     return (1.0/(1*math.pi*(sigma**2)))*math.exp(-(1.0/(2*(sigma**2)))*(x**2 + y**2))
 
 
-def mexicanHat(x, y, sigma1, sigma2):
+def mexican_hat(x, y, sigma1, sigma2):
+    ''' @ gausain mixture(difference) creates mexican hat like shape '''
     return gaussian2D(x, y, sigma1) - gaussian2D(x, y, sigma2)
 
 
-def receptiveFieldMatrix(func):
+def receptive_field_matrix(func):
     """make matrix from function"""
     h = 30
     g = np.zeros((h, h))
@@ -24,7 +26,8 @@ def receptiveFieldMatrix(func):
     return g
 
 
-def plotFilter(fun):
+def plot_filter(fun):
+    '''TODO: decide about this function '''
     g = receptiveFieldMatrix(fun)
     #plt.imshow(g, cmap=plt.cm.Greys_r
 

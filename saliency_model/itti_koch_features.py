@@ -9,9 +9,12 @@ def compute_intensity(img_list):
     :param img_list: image in different scales
     :return: list of intensity values for each image
     """
+    
     img_avg = []
 
-    for i in img_list:
-        img_avg.append(np.mean(i, axis=2))
+    for img in img_list:
+        img_avg.append(np.mean(img, axis=2))
 
     return img_avg
+
+

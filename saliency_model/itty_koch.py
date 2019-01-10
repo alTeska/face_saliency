@@ -4,7 +4,7 @@ import numpy as np
 import scipy.signal as signal
 import matplotlib.image as mpimg
 
-from .utils import receptive_field_matrix, mexican_hat, downsample_image
+from .utils import *
 from .itti_koch_features import *
 
 
@@ -18,29 +18,41 @@ class IttiKoch():
 
         # Load The Image
         self.img = mpimg.imread(path)
+        
+        self.mapwidth = 64
+        self.outer_sigma = [3,6]
+        self.inner_sigma = [1,1]
+        
         pass
 
     def run(self):
         img = self.img
 
-        # convert to double if image is uint8
-        img_hat = signal.convolve(img[:,:,0], receptive_field_matrix(lambda x,y: mexican_hat(x,y,2,3)), mode='same')
+        # TODO convert to double if image is uint8
 
         # determine size and number of Center scales
-        mapwidth = 64
-        mapheight = round(img.shape[0] * (mapwidth / img.shape[1]))
+        mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
         scalars = [1, 2, 3]
 
-        img_list = downsample_image(img, mapheight, mapwidth, scalars)
+        img_scales = downsample_image(img, mapsize[0], self.mapwidth, scalars)
+        
+        saliency_maps = []
+        for img in img_scales:
+            
+            # TODO split to channels & compute salience in each
+            
+            # intensity
+            intensity = compute_intensity([img])
 
-        # split to channels & compute salience in each
-        img_int = compute_intensity(img_list)
+            # each channel apply the center surround
+            convolution_maps = convolve_receptive_field(intensity, self.inner_sigma, self.outer_sigma)
+            
+            # compute saliency map from single feature maps
+            saliency_maps.append(compute_saliency_map(convolution_maps, mapsize))
 
-        # each channel apply the center surround
+            # TODO normalize channels
 
-        # normalize channels
-
-        # sum together maps across channels
+            # TODO sum together maps across channels
 
 
-        return img_list, img_int
+        return saliency_maps

@@ -1,12 +1,14 @@
 import math
+import warnings
 import numpy as np
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 import skimage.transform as transform
-import warnings
 
 from skimage.feature import peak_local_max
 from skimage.transform import resize
+from skimage.filters import gabor_kernel
+from scipy import ndimage as nd
 
 
 def gaussian2D(x, y, sigma):
@@ -29,6 +31,35 @@ def receptive_field_matrix(func):
             y = yi-h/2
             g[xi, yi] = func(x, y)
     return g
+
+
+def create_gabor_kernels(theta=4, sigma=4, frequency=0.1, phase=False):
+    '''
+    Function returns multiple Gabor Filters kernels. Theta defines how many
+    different angles will be taken into accout: 180 / theta
+    (example: theta=4 -> angles [0, 45, 90, 135])
+    '''
+    kernels = []
+
+    for theta in range(int(theta)):
+        theta = theta / 4. * np.pi
+        kernel = np.real(gabor_kernel(frequency, theta=theta,
+                                      sigma_x=sigma, sigma_y=sigma,
+                                      offset=phase))
+        kernels.append(kernel)
+
+    return kernels
+
+
+def convolve_kernels(image, kernels):
+    '''compute features for multiple kernels: convolve with image'''
+    feats = []
+
+    for kernel in kernels:
+        filtered = nd.convolve(image, kernel)
+        feats.append(filtered)
+
+    return feats
 
 
 def downsample_image(image, min_height, min_width, scaling_factors):

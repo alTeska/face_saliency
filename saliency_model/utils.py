@@ -6,7 +6,7 @@ import skimage.transform as transform
 
 def gaussian2D(x, y, sigma):
     '''create 2D Gaussian distribution'''
-    return (1.0/(1*math.pi*(sigma**2)))*math.exp(-(1.0/(2*(sigma**2)))*(x**2 + y**2))
+    return (1.0/(2*math.pi*(sigma**2)))*math.exp(-(1.0/(2*(sigma**2)))*(x**2 + y**2))
 
 
 def mexican_hat(x, y, sigma1, sigma2):

@@ -10,17 +10,14 @@ path = './imgs/balloons.png'
 img = mpimg.imread(path)
 
 IK = IttiKoch(path)
-img_list, img_int = IK.run()
+saliency_maps, saliency_map = IK.run()
 
 
-fig, ax = plt.subplots(1, 3, figsize=(15, 15))
-ax[0].imshow(img_list[0])
-ax[1].imshow(img_list[1])
-ax[2].imshow(img_list[2]);
+fig, ax = plt.subplots(1, 4, figsize=(15, 15))
+ax[0].imshow(saliency_maps[0])
+ax[1].imshow(saliency_maps[1])
+ax[2].imshow(saliency_maps[2]);
+ax[3].imshow(saliency_map);
 
-fig, ax = plt.subplots(1, 3, figsize=(15, 15))
-ax[0].imshow(img_int[0])
-ax[1].imshow(img_int[1])
-ax[2].imshow(img_int[2]);
 
 plt.show()

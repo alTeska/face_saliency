@@ -31,12 +31,6 @@ def receptive_field_matrix(func):
     return g
 
 
-def plot_filter(fun):
-    '''TODO: decide about this function '''
-    g = receptiveFieldMatrix(fun)
-    #plt.imshow(g, cmap=plt.cm.Greys_r
-
-
 def downsample_image(image, min_height, min_width, scaling_factors):
     '''
     Downsamples the image to a smaller map size, while keeping the third dimension as it is.
@@ -61,11 +55,11 @@ def convolve_receptive_field(input_list, sigma1, sigma2):
     """
     if (len(sigma1) != len(sigma2)):
         warnings.warn("Amount of sigmas for inner and outer Gaussian are not the same!")
-        
+
     # outer loop over the feature images provided
     output_list = []
     for img in input_list:
-        
+
         # inner loop over the sigma-combinations
         img_hat = []
         for s1, s2 in zip(sigma1, sigma2):
@@ -74,18 +68,15 @@ def convolve_receptive_field(input_list, sigma1, sigma2):
             rf2 = receptive_field_matrix(lambda x, y: gaussian2D(x, y, s2))
 
             # list containing different kernel sizes
-            img_conv = signal.convolve2d(img, rf1, mode='same')  # convolve image with narrow gaussian
-            convolved = signal.convolve2d(img, rf2, mode='same') # convolve image with wide gaussian
-            
+            img_conv = signal.convolve2d(img, rf1, mode='same')   # convolve image with narrow gaussian
+            convolved = signal.convolve2d(img, rf2, mode='same')  # convolve image with wide gaussian
+
             # substract one conv. img with the other
             # corresponds to creating the mexican hat function
             conv = (img_conv - convolved)**2
-            
-#             img_hat.append(conv)                     # save as 2D list
-#             output_list.append(img_hat)
 
             # list containing convolved versions of all images
-            output_list.append(conv) # save as 1D list
+            output_list.append(conv)
 
     return output_list
 
@@ -102,47 +93,52 @@ def get_weight_map(peak_avg, peak_num):
     based on number of peaks and their average return weight of the map used for
     normalization, measure of peakiness
     '''
-    
+
     if peak_num <= 1:
         return 1
     else:
         return (1 - peak_avg)**2
 
-    
+
 def get_local_maxima(sal_map, min_distance=1, threshold_abs=0.1):
     '''
-    Input image, find local minima with min_distance window between points. 
+    Input image, find local minima with min_distance window between points.
     Return average of local minimas and their number
     '''
-    
+
     coordinates = peak_local_max(sal_map, min_distance=min_distance, threshold_abs=threshold_abs)
-    
+
     peak_avg = 0
     peak_num = np.shape(coordinates)[0]
-        
-    for x,y in coordinates:
+
+    for x, y in coordinates:
         peak_avg = peak_avg + sal_map[x][y]
-    
+
     if (peak_num != 0):
         peak_avg = peak_avg/peak_num
-    
+
     return peak_avg, peak_num
 
 
 def compute_saliency_map(convolution_maps, mapsize):
+    '''
+    Function computest saliency maps based on convolution_maps and expected mapsize.
+    Maps get scaled between 0-1, then local minima are found and averaged for additional scaling.
+    '''
+
     weights = []
     saliency_map = np.zeros(mapsize)
 
     for i,m in enumerate(convolution_maps):
-    
+
         # normalize the maps to have values between 0 and 1
         m = normalize(m)
-    
+
         # get local maxima of the map
         peak_avg, peak_num = get_local_maxima(m, min_distance=1)
         weights.append(get_weight_map(peak_avg, peak_num))
-    
+
         temp = resize(m, mapsize, mode='constant', anti_aliasing=True)
         saliency_map += weights[i] * temp
-    
+
     return saliency_map

@@ -18,11 +18,11 @@ class IttiKoch():
 
         # Load The Image
         self.img = mpimg.imread(path)
-        
+
         self.mapwidth = 64
         self.outer_sigma = [3,6]
         self.inner_sigma = [1,1]
-        
+
         pass
 
     def run(self):
@@ -35,24 +35,27 @@ class IttiKoch():
         scalars = [1, 2, 3]
 
         img_scales = downsample_image(img, mapsize[0], self.mapwidth, scalars)
-        
+
         saliency_maps = []
         for img in img_scales:
-            
+
             # TODO split to channels & compute salience in each
-            
+
             # intensity
             intensity = compute_intensity([img])
 
             # each channel apply the center surround
             convolution_maps = convolve_receptive_field(intensity, self.inner_sigma, self.outer_sigma)
-            
+
             # compute saliency map from single feature maps
             saliency_maps.append(compute_saliency_map(convolution_maps, mapsize))
+
 
             # TODO normalize channels
 
             # TODO sum together maps across channels
 
+        # sum across scales
+        saliency_map = sum(saliency_maps)
 
-        return saliency_maps
+        return saliency_maps, saliency_map

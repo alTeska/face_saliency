@@ -1,4 +1,4 @@
-# test gabor
+# test gabor filters
 from saliency_model.utils import create_gabor_kernels
 import matplotlib.pyplot as plt
 plt.rcParams['image.cmap'] = 'gray'

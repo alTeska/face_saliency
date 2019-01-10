@@ -23,14 +23,17 @@ class IttiKoch():
         self.outer_sigma = [3,6]
         self.inner_sigma = [1,1]
 
+        self.weights = [1,1,1]
+
         pass
 
     def run(self):
         img = self.img
 
-        gabor_kernels = create_gabor_kernels()
-
         # TODO convert to double if image is uint8
+
+        # create gabor kernels
+        gabor_kernels = create_gabor_kernels()
 
         # determine size and number of Center scales
         mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
@@ -66,9 +69,9 @@ class IttiKoch():
         saliency_map_o = sum(saliency_maps_o)
 
         # TODO normalize channels
-        
+
 
         # TODO sum together maps across channels
+        saliency = saliency_map + saliency_map_c + saliency_map_o
 
-
-        return saliency_maps, saliency_map, saliency_maps_o, saliency_map_o, saliency_maps_c, saliency_map_c
+        return saliency, saliency_map, saliency_map_c, saliency_map_o

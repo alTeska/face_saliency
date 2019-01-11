@@ -1,6 +1,8 @@
 .idea
 saliency_model/__pycache__/*
 .ipynb_checkpoints/
+/other
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

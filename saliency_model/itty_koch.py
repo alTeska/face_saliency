@@ -27,6 +27,9 @@ class IttiKoch():
 
         pass
 
+    def make_feature_map(func):
+        pass
+
     def run(self):
         img = self.img
 
@@ -44,6 +47,7 @@ class IttiKoch():
         saliency_maps = []
         saliency_maps_o = []
         saliency_maps_c = []
+
         for img in img_scales:
 
             # TODO split to channels & compute salience in each
@@ -51,7 +55,7 @@ class IttiKoch():
             # intensity
             intensity = compute_intensity([img])
             color = np.squeeze(compute_color([img]))
-            orientation = convolve_kernels(np.squeeze(intensity), gabor_kernels)
+            orientation = compute_orientation([img], gabor_kernels)
 
             # each channel apply the center surround
             convolution_maps = convolve_receptive_field(intensity, self.inner_sigma, self.outer_sigma)

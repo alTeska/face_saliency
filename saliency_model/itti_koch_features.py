@@ -1,6 +1,7 @@
 # Basic features implemented by the Itti-Koch Algorithm
 
 import numpy as np
+from .utils import convolve_kernels
 
 
 def compute_intensity(img_list):
@@ -25,7 +26,7 @@ def compute_color(img_list):
     :param img_list: image in different scales
     :return: rg, by colors
     '''
-    
+
     img_col = []
 
     for img in img_list:
@@ -41,3 +42,16 @@ def compute_color(img_list):
         img_col.append([rg, by])
 
     return img_col
+
+
+def compute_orientation(img_list, gabor_kernels):
+    """
+    Computes the mean over the RGB values of the image to get intensity value.
+    :param img_list: image in different scales
+    :return: list of orientation values for each image
+    """
+
+    intensity = (compute_intensity(img_list))
+    orientation = convolve_kernels(np.squeeze(intensity), gabor_kernels)
+
+    return orientation

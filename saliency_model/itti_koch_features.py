@@ -41,7 +41,7 @@ def compute_color(img_list):
         rg = np.divide((r - g), lum)                 # (R-G)
         img_col.append([rg, by])
 
-    return img_col
+    return np.squeeze(img_col)
 
 
 def compute_orientation(img_list, gabor_kernels):

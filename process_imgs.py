@@ -11,6 +11,14 @@ img = mpimg.imread(path)
 
 IK = IttiKoch(path)
 saliency, saliency_map_i, saliency_map_c, saliency_map_o = IK.run()
+# saliency, saliency_map_i = IK.run()
+
+# fig, ax = plt.subplots(1, 2, figsize=(15, 5))
+# ax[0].imshow(saliency_map_i)
+# ax[1].imshow(saliency)
+# ax[0].set_title('intensity')
+# ax[1].set_title('ICO')
+
 
 fig, ax = plt.subplots(1, 4, figsize=(15, 5))
 ax[0].imshow(saliency_map_i)

@@ -54,7 +54,7 @@ class IttiKoch():
 
             # intensity
             intensity = compute_intensity([img])
-            color = np.squeeze(compute_color([img]))
+            color = compute_color([img])
             orientation = compute_orientation([img], gabor_kernels)
 
             # each channel apply the center surround

@@ -160,7 +160,7 @@ def compute_saliency_map(convolution_maps, mapsize):
     weights = []
     saliency_map = np.zeros(mapsize)
 
-    for i,m in enumerate(convolution_maps):
+    for i, m in enumerate(convolution_maps):
 
         # normalize the maps to have values between 0 and 1
         m = normalize(m)

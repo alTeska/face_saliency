@@ -27,8 +27,12 @@ class IttiKoch():
 
         pass
 
-    def make_feature_map(func):
-        pass
+    def make_feature_map(self, imgs, feature_func, *args):
+        '''given a function for the feature, calculates the convolved feature map'''
+        feat_maps = feature_func(imgs, *args)
+        conv_maps = convolve_receptive_field(feat_maps, self.inner_sigma, self.outer_sigma)
+
+        return conv_maps
 
     def run(self):
         img = self.img
@@ -39,43 +43,39 @@ class IttiKoch():
         gabor_kernels = create_gabor_kernels()
 
         # determine size and number of Center scales
-        mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
+        self.mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
         scalars = [1, 2, 3]
 
-        img_scales = downsample_image(img, mapsize[0], self.mapwidth, scalars)
+        img_scales = downsample_image(img, self.mapsize[0], self.mapwidth, scalars)
+
+        num_chan = 3 # TODO: to normalize the channels
+
 
         saliency_maps = []
         saliency_maps_o = []
         saliency_maps_c = []
 
+
         for img in img_scales:
+            # calculate chosen feature
+            intensity_maps = self.make_feature_map([img], compute_intensity)
+            color_maps = self.make_feature_map([img], compute_color)
+            orientation_maps = self.make_feature_map([img], compute_orientation, gabor_kernels)
 
-            # TODO split to channels & compute salience in each
+            # normalize
+            saliency_maps.append(compute_saliency_map(intensity_maps, self.mapsize))
+            saliency_maps_c.append(compute_saliency_map(color_maps, self.mapsize))
+            saliency_maps_o.append(compute_saliency_map(orientation_maps, self.mapsize))
 
-            # intensity
-            intensity = compute_intensity([img])
-            color = compute_color([img])
-            orientation = compute_orientation([img], gabor_kernels)
 
-            # each channel apply the center surround
-            convolution_maps = convolve_receptive_field(intensity, self.inner_sigma, self.outer_sigma)
-            convolution_maps_c = convolve_receptive_field(color, self.inner_sigma, self.outer_sigma)
-            convolution_maps_o = convolve_receptive_field(orientation, self.inner_sigma, self.outer_sigma)
-
-            # compute saliency map from single feature maps
-            saliency_maps.append(compute_saliency_map(convolution_maps, mapsize))
-            saliency_maps_c.append(compute_saliency_map(convolution_maps_c, mapsize))
-            saliency_maps_o.append(compute_saliency_map(convolution_maps_o, mapsize))
-
-        # sum across scales
-        saliency_map = sum(saliency_maps)
-        saliency_map_c = sum(saliency_maps_c)
-        saliency_map_o = sum(saliency_maps_o)
-
-        # TODO normalize channels
+        # sum across scales & normalize
+        saliency_map = compute_saliency_map(saliency_maps, self.mapsize)
+        saliency_map_c = compute_saliency_map(saliency_maps_c, self.mapsize)
+        saliency_map_o = compute_saliency_map(saliency_maps_o, self.mapsize)
 
 
         # TODO sum together maps across channels
-        saliency = saliency_map + saliency_map_c + saliency_map_o
+        saliency = saliency_map/3 + saliency_map_c/3 + saliency_map_o/3
 
         return saliency, saliency_map, saliency_map_c, saliency_map_o
+        # return saliency, saliency_map

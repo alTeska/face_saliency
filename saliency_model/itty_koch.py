@@ -65,8 +65,8 @@ class IttiKoch():
 
     def run(self):
         img = self.img
-
-        wj = [.3, .3, .3]   # linear combination of weights
+        wj = self.weights
+        
         gabor_kernels = create_gabor_kernels()
 
         # compute spatial scales

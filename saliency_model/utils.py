@@ -151,14 +151,16 @@ def get_local_maxima(sal_map, min_distance=1, threshold_abs=0.1):
     return peak_avg, peak_num
 
 
-def compute_conspicuity_map(convolution_maps, mapsize):
+def compute_conspicuity_map(convolution_maps, mapsize, resize_map = True):
     '''
-    Function computest conspicuity maps based on convolution_maps and expected mapsize.
+    Function computes conspicuity maps based on convolution_maps and expected mapsize.
     Maps get scaled between 0-1, then local minima are found and averaged for additional scaling.
+    Afterwards maps get normalized / scaled between 0 and 1 again.
     '''
 
     weights = []
-    conspicuity_map = np.zeros(mapsize)
+    sum_weights = 0
+    conspicuity_map = np.zeros_like(convolution_maps[0])
 
     for i, m in enumerate(convolution_maps):
 
@@ -168,8 +170,12 @@ def compute_conspicuity_map(convolution_maps, mapsize):
         # get local maxima of the map
         peak_avg, peak_num = get_local_maxima(m, min_distance=1)
         weights.append(get_weight_map(peak_avg, peak_num))
-
-        temp = resize(m, mapsize, mode='constant', anti_aliasing=True)
-        conspicuity_map += weights[i] * temp
+        
+        if (resize_map):
+            m = resize(m, mapsize, mode='constant', anti_aliasing=True)
+            
+        conspicuity_map += weights[i] * m
+        
+    conspicuity_map = normalize(conspicuity_map)
 
     return conspicuity_map

@@ -3,6 +3,7 @@ import math
 import numpy as np
 import scipy.signal as signal
 import matplotlib.image as mpimg
+from skimage import img_as_float64
 
 from .utils import *
 from .itti_koch_features import *
@@ -13,12 +14,10 @@ class IttiKoch():
     Itti and Koch main model class.
     Inputs upon init: path to the image, changes to setup dict
     '''
-    def __init__(self, path):
+    def __init__(self, img):
         super().__init__()
 
-        # Load The Image
-        self.img = mpimg.imread(path)
-
+        self.img = img_as_float64(img)      # convert to doubles if image is uint8
         self.mapwidth = 64
         self.outer_sigma = [3,6]
         self.inner_sigma = [1,1]
@@ -27,55 +26,59 @@ class IttiKoch():
 
         pass
 
-    def make_feature_map(self, imgs, feature_func, *args):
-        '''given a function for the feature, calculates the convolved feature map'''
+    def make_center_scales(self, img, scalars):
+        '''
+        Gaussian pyramid creation: based on image and scalars creates a list of
+        downsampled images with lenght according to inp scalars
+        '''
+        # determine size of center scales
+        self.mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
+        img_scales = downsample_image(img, self.mapsize[0], self.mapwidth, scalars)
+
+        return img_scales
+
+
+    def make_feature_maps(self, imgs, feature_func, *args):
+        '''
+        Given an image and a function for the feature, calculates the convolved
+        feature maps.
+        '''
         feat_maps = feature_func(imgs, *args)
         conv_maps = convolve_receptive_field(feat_maps, self.inner_sigma, self.outer_sigma)
 
         return conv_maps
 
+    def make_conspicuity_maps(self, img_scales, feature_func, *args):
+        '''
+        Function creates conspicuity map based on given image scales for given feature
+        '''
+        conspicuity_maps = []
+        for img in img_scales:
+            feature_maps = self.make_feature_maps([img], feature_func, *args)
+            conspicuity_map = compute_conspicuity_map(feature_maps, self.mapsize)
+            conspicuity_maps.append(conspicuity_map)
+
+        # sum & normalize across scales
+        conspicuity_map = compute_conspicuity_map(conspicuity_maps, self.mapsize)
+        return conspicuity_map
+
+
     def run(self):
         img = self.img
 
-        # TODO convert to double if image is uint8
-
-        # create gabor kernels
+        wj = [.3, .3, .3]   # linear combination of weights
         gabor_kernels = create_gabor_kernels()
 
-        # determine size and number of Center scales
-        self.mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
-        scalars = [1, 2, 3]
+        # compute spatial scales
+        img_scales = self.make_center_scales(img, [1, 2, 3])
 
-        img_scales = downsample_image(img, self.mapsize[0], self.mapwidth, scalars)
+        # compute conspicuity_map for each channel
+        intensity = self.make_conspicuity_maps(img_scales, compute_intensity)
+        color = self.make_conspicuity_maps(img_scales, compute_color)
+        orientation = self.make_conspicuity_maps(img_scales, compute_orientation, gabor_kernels)
 
-        num_chan = 3 # TODO: to normalize the channels
+        # sum & normalize across channels
+        saliency = wj[0]*intensity + wj[1]*color + wj[2]*orientation
 
-
-        saliency_maps = []
-        saliency_maps_o = []
-        saliency_maps_c = []
-
-
-        for img in img_scales:
-            # calculate chosen feature
-            intensity_maps = self.make_feature_map([img], compute_intensity)
-            color_maps = self.make_feature_map([img], compute_color)
-            orientation_maps = self.make_feature_map([img], compute_orientation, gabor_kernels)
-
-            # normalize
-            saliency_maps.append(compute_saliency_map(intensity_maps, self.mapsize))
-            saliency_maps_c.append(compute_saliency_map(color_maps, self.mapsize))
-            saliency_maps_o.append(compute_saliency_map(orientation_maps, self.mapsize))
-
-
-        # sum across scales & normalize
-        saliency_map = compute_saliency_map(saliency_maps, self.mapsize)
-        saliency_map_c = compute_saliency_map(saliency_maps_c, self.mapsize)
-        saliency_map_o = compute_saliency_map(saliency_maps_o, self.mapsize)
-
-
-        # TODO sum together maps across channels
-        saliency = saliency_map/3 + saliency_map_c/3 + saliency_map_o/3
-
-        return saliency, saliency_map, saliency_map_c, saliency_map_o
-        # return saliency, saliency_map
+        # return saliency
+        return saliency, intensity, color, orientation

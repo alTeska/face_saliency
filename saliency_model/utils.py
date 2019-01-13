@@ -151,14 +151,14 @@ def get_local_maxima(sal_map, min_distance=1, threshold_abs=0.1):
     return peak_avg, peak_num
 
 
-def compute_saliency_map(convolution_maps, mapsize):
+def compute_conspicuity_map(convolution_maps, mapsize):
     '''
-    Function computest saliency maps based on convolution_maps and expected mapsize.
+    Function computest conspicuity maps based on convolution_maps and expected mapsize.
     Maps get scaled between 0-1, then local minima are found and averaged for additional scaling.
     '''
 
     weights = []
-    saliency_map = np.zeros(mapsize)
+    conspicuity_map = np.zeros(mapsize)
 
     for i, m in enumerate(convolution_maps):
 
@@ -170,6 +170,6 @@ def compute_saliency_map(convolution_maps, mapsize):
         weights.append(get_weight_map(peak_avg, peak_num))
 
         temp = resize(m, mapsize, mode='constant', anti_aliasing=True)
-        saliency_map += weights[i] * temp
+        conspicuity_map += weights[i] * temp
 
-    return saliency_map
+    return conspicuity_map

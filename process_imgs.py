@@ -9,21 +9,13 @@ plt.rcParams['image.cmap'] = 'gray'
 path = './imgs/balloons.png'
 img = mpimg.imread(path)
 
-IK = IttiKoch(path)
-saliency, saliency_map_i, saliency_map_c, saliency_map_o = IK.run()
-# saliency, saliency_map_i = IK.run()
+IK = IttiKoch(img)
 
-# fig, ax = plt.subplots(1, 2, figsize=(15, 5))
-# ax[0].imshow(saliency_map_i)
-# ax[1].imshow(saliency)
-# ax[0].set_title('intensity')
-# ax[1].set_title('ICO')
-
-
+saliency, intensity, color, orientation = IK.run()
 fig, ax = plt.subplots(1, 4, figsize=(15, 5))
-ax[0].imshow(saliency_map_i)
-ax[1].imshow(saliency_map_o)
-ax[2].imshow(saliency_map_c)
+ax[0].imshow(intensity)
+ax[1].imshow(orientation)
+ax[2].imshow(color)
 ax[3].imshow(saliency)
 ax[0].set_title('intensity')
 ax[1].set_title('orientation')

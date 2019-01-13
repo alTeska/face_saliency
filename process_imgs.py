@@ -9,13 +9,17 @@ plt.rcParams['image.cmap'] = 'gray'
 path = './imgs/balloons.png'
 img = mpimg.imread(path)
 
-IK = IttiKoch()
+params_ik = {
+    "mapwidth": 64
+}
 
-saliency, intensity, color, orientation = IK.run(img)
+features = ["intensity", "orientation", "color"]
+saliency, maps = IK.run(img, features)
+
 fig, ax = plt.subplots(1, 4, figsize=(15, 5))
-ax[0].imshow(intensity)
-ax[1].imshow(orientation)
-ax[2].imshow(color)
+ax[0].imshow(maps[0])
+ax[1].imshow(maps[1])
+ax[2].imshow(maps[2])
 ax[3].imshow(saliency)
 ax[0].set_title('intensity')
 ax[1].set_title('orientation')

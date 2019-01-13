@@ -75,36 +75,44 @@ class IttiKoch():
 
         return conspicuity_map
 
-    def run(self, img):
-        # TODO: add ( , keys): that will decide which feature to use
-        '''Given an image returns its saliency'''
+    def run(self, img, keys = ["intensity", "color", "orientation"]):
+        '''
+        Given an image returns its saliency and the single saliency maps in the order of feature  input
+        '''
         img = img_as_float64(img) # convert to doubles if image is uint8
 
         # compute spatial scales
         print("Computing {} image scales".format(self.params["num_center_scales"]))
         img_scales = self.make_center_scales(img, np.arange(self.params["num_center_scales"])+1)
-
-        # compute conspicuity_map for each channel
-        # intensity
-        print("Computing saliency map for intensity.")
-        intensity = self.make_conspicuity_maps(img_scales, compute_intensity)
         
-        # color
-        print("Computing saliency map for color.")
-        color = self.make_conspicuity_maps(img_scales, compute_color)
-        
-        # orientation
         print("Creating Gabor kernels for orientation.")
         gabor_kernels = create_gabor_kernels(theta = self.params["gabor_theta"],
                                             sigma = self.params["gabor_sigma"],
                                             frequency = self.params["gabor_frequency"],
                                             phase = self.params["gabor_phase"])
-        print("Computing saliency map for orientation.")
-        orientation = self.make_conspicuity_maps(img_scales, compute_orientation, gabor_kernels)
+
+        # compute conspicuity_map for each channel
+        saliency_maps = []
+        
+        # iterate over features to compute (keys)
+        for key in keys:
+            print("Computing saliency maps for {}.".format(key))
+            
+            # get corresponding function
+            curr_func = globals()["compute_"+key]
+            
+            # compute conspicuity map
+            if (key == "orientation"):
+                saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels))
+            else:
+                saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func))
 
         # sum & normalize across channels
         wj = self.params["topdown_weights"]
-        saliency = wj[0]*intensity + wj[1]*color + wj[2]*orientation
+        
+        saliency = np.zeros(self.params["mapsize"])
+        for i in np.arange(len(saliency_maps)):
+            saliency = saliency + wj[i]*saliency_maps[i]
 
         # return saliency
-        return saliency, intensity, color, orientation
+        return saliency, saliency_maps

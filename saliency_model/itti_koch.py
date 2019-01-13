@@ -67,11 +67,12 @@ class IttiKoch():
         conspicuity_maps = []
         for img in img_scales:
             feature_maps = self.make_feature_maps([img], feature_func, *args)
-            conspicuity_map = compute_conspicuity_map(feature_maps, self.params["mapsize"])
+            conspicuity_map = compute_conspicuity_map(feature_maps, self.params["mapsize"], resize_map=False)
+            # append the normalized conspicuity map
             conspicuity_maps.append(conspicuity_map)
 
-        # TODO sum & normalize across scales
-        conspicuity_map = compute_conspicuity_map(conspicuity_maps, self.params["mapsize"])
+        # compute weighted sum across images scales, do resizing to deal with different image sizes
+        conspicuity_map = compute_conspicuity_map(conspicuity_maps, self.params["mapsize"], resize_map=True)
 
         return conspicuity_map
 

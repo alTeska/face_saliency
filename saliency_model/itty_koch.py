@@ -14,10 +14,9 @@ class IttiKoch():
     Itti and Koch main model class.
     Inputs upon init: path to the image, changes to setup dict
     '''
-    def __init__(self, img):
+    def __init__(self):
         super().__init__()
 
-        self.img = img_as_float64(img)      # convert to doubles if image is uint8
         self.mapwidth = 64
         self.outer_sigma = [3,6]
         self.inner_sigma = [1,1]
@@ -64,8 +63,8 @@ class IttiKoch():
         return conspicuity_map
 
 
-    def run(self):
-        img = self.img
+    def run(self, img):
+        img = img_as_float64(img)      # convert to doubles if image is uint8
         wj = self.weights
 
         gabor_kernels = create_gabor_kernels()

@@ -15,6 +15,7 @@ class IttiKoch():
     Inputs upon init: path to the image, changes to setup dict
     '''
     def __init__(self):
+        # TODO: add ( , dict): that can be used to set up features
         super().__init__()
 
         self.mapwidth = 64
@@ -62,9 +63,10 @@ class IttiKoch():
 
         return conspicuity_map
 
-
     def run(self, img):
-        img = img_as_float64(img)      # convert to doubles if image is uint8
+        # TODO: add ( , keys): that will decide which feature to use
+        '''Given an image returns its saliency'''
+        img = img_as_float64(img) # convert to doubles if image is uint8
         wj = self.weights
 
         gabor_kernels = create_gabor_kernels()

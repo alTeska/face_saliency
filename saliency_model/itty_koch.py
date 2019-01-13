@@ -21,32 +21,32 @@ class IttiKoch():
         self.mapwidth = 64
         self.outer_sigma = [3,6]
         self.inner_sigma = [1,1]
-
         self.weights = [1,1,1]
 
         pass
 
+
     def make_center_scales(self, img, scalars):
         '''
-        Gaussian pyramid creation: based on image and scalars creates a list of
-        downsampled images with lenght according to inp scalars
+        Gaussian pyramid creation: based on image and scalars
+        returns a list of downsampled images with lenght according to inp scalars
         '''
         # determine size of center scales
         self.mapsize = (round(img.shape[0] * (self.mapwidth / img.shape[1])), self.mapwidth)
-        img_scales = downsample_image(img, self.mapsize[0], self.mapwidth, scalars)
 
-        return img_scales
+        return downsample_image(img, self.mapsize[0], self.mapwidth, scalars)
 
 
     def make_feature_maps(self, imgs, feature_func, *args):
         '''
         Given an image and a function for the feature, calculates the convolved
         feature maps.
+        Returns: convolution maps
         '''
         feat_maps = feature_func(imgs, *args)
-        conv_maps = convolve_receptive_field(feat_maps, self.inner_sigma, self.outer_sigma)
 
-        return conv_maps
+        return convolve_receptive_field(feat_maps, self.inner_sigma, self.outer_sigma)
+
 
     def make_conspicuity_maps(self, img_scales, feature_func, *args):
         '''
@@ -58,15 +58,16 @@ class IttiKoch():
             conspicuity_map = compute_conspicuity_map(feature_maps, self.mapsize)
             conspicuity_maps.append(conspicuity_map)
 
-        # sum & normalize across scales
+        # TODO sum & normalize across scales
         conspicuity_map = compute_conspicuity_map(conspicuity_maps, self.mapsize)
+
         return conspicuity_map
 
 
     def run(self):
         img = self.img
         wj = self.weights
-        
+
         gabor_kernels = create_gabor_kernels()
 
         # compute spatial scales

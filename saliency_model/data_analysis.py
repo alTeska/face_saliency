@@ -35,3 +35,7 @@ plt.plot(np.arange(0, 1, 1/len(fp)), np.arange(0,1, 1/len(fp)));
 # (2) NSS metric
 nss_score = compute_nss(sal_map, fix_binary)
 print("NSS: {}".format(nss_score))
+
+# (3) Similarity metric
+sim_score = compute_similarity(sal_map, fix_map)
+print("SIM: {}".format(sim_score))

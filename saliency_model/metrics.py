@@ -94,6 +94,19 @@ def compute_nss(sal_map, fix_binary):
     sal_norm = (sal_map - np.mean(sal_map)) / np.std(sal_map)
 
     # compute NSS
-    NSS = np.sum(np.multiply(sal_norm, fix_binary)) / N_fixations
+    NSS = np.sum(np.multiply(sal_norm, fix_binary), axis = (0,1)) / N_fixations
     
     return NSS
+
+
+def compute_similarity(sal_map, fix_map):
+   
+    # adjust the image size if it hasn't been done before
+    sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
+    
+    # normalize both to match probability distributions
+    fix_norm = fix_map / np.sum(fix_map)
+    sal_norm = sal_map / np.sum(sal_map)
+    
+    # sum over the minima of both normalized maps
+    return np.sum(np.minimum(fix_norm, sal_norm))

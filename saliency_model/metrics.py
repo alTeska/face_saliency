@@ -8,7 +8,8 @@ def auc_judd_score(sal_map, fix_map):
     TODO: more explanation here?
     '''
     
-    fix_map, sal_map = adjust_image_size(fix_map, sal_map)
+    # scale both images to the size of fixation map
+    sal_map, fix_map = adjust_image_size(sal_map, fix_map)
 
     # sort the saliency values for the real fixations, which are then used as thresholds
     sorted_th = np.flip(np.sort(sal_map[fix_map > 0]))
@@ -26,7 +27,7 @@ def auc_judd_score(sal_map, fix_map):
     return score, tp, fp, thresholds
 
 
-def adjust_image_size(img1, img2, downscale_only = True):
+def adjust_image_size(img1, img2, downscale_only = False):
     '''
     Checks if the images have the same size. If not, it rescales the first image to the size of the second image. 
     If downscale_only is set to true, the bigger one is scaled to the size of the smaller image, regardless of the ordering.
@@ -41,7 +42,7 @@ def adjust_image_size(img1, img2, downscale_only = True):
             img2 = resize(img2, np.shape(img1), mode='constant', anti_aliasing=True)
     
     else:
-        # scale both maps to the size of the fixation map
+        # scale both maps to the size of the first map
         if (np.size(img1, 0) != np.size(img2, 0) or np.size(img1, 1) != np.size(img2, 1)):
             img1 = resize(img1, np.shape(img2), mode='constant', anti_aliasing=True)
     
@@ -81,3 +82,18 @@ def compute_tp_fp(sorted_thr, sal_map):
     return tp, fp
 
 
+def compute_nss(sal_map, fix_binary):
+    
+    # adjust the image size if it hasn't been done before
+    sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
+    
+    # compute total amount of fixated pixels
+    N_fixations = np.sum(fix_binary, axis = (0,1))
+    
+    # z-score of saliency map
+    sal_norm = (sal_map - np.mean(sal_map)) / np.std(sal_map)
+
+    # compute NSS
+    NSS = np.sum(np.multiply(sal_norm, fix_binary)) / N_fixations
+    
+    return NSS

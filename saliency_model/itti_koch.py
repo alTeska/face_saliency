@@ -14,9 +14,9 @@ class IttiKoch():
     Itti and Koch main model class.
     Inputs upon init: path to the image, changes to setup dict
     '''
-    def __init__(self, input_params):
+    def __init__(self, input_params=None):
         super().__init__()
-        
+
         # dictionary with default params
         self.params = {
             "min_mapwidth": 64,
@@ -29,12 +29,13 @@ class IttiKoch():
             "gabor_frequency": 0.1,
             "gabor_phase": False
         }
-        
-        # update the parameters with the input
-        for key in input_params:
-            self.params[key] = input_params[key]
 
-        pass
+        # update the parameters with the input
+        if input_params:
+            for key in input_params:
+                self.params[key] = input_params[key]
+
+            pass
 
 
     def make_center_scales(self, img, scalars):
@@ -84,7 +85,7 @@ class IttiKoch():
         # compute spatial scales
         print("Computing {} image scales".format(self.params["num_center_scales"]))
         img_scales = self.make_center_scales(img, np.arange(self.params["num_center_scales"])+1)
-        
+
         print("Creating Gabor kernels for orientation.")
         gabor_kernels = create_gabor_kernels(theta = self.params["gabor_theta"],
                                             sigma = self.params["gabor_sigma"],
@@ -93,14 +94,14 @@ class IttiKoch():
 
         # compute conspicuity_map for each channel
         saliency_maps = []
-        
+
         # iterate over features to compute (keys)
         for key in keys:
             print("Computing saliency maps for {}.".format(key))
-            
+
             # get corresponding function
             curr_func = globals()["compute_"+key]
-            
+
             # compute conspicuity map
             if (key == "orientation"):
                 saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels))
@@ -109,7 +110,7 @@ class IttiKoch():
 
         # sum & normalize across channels
         wj = self.params["topdown_weights"]
-        
+
         saliency = np.zeros(self.params["mapsize"])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]

@@ -14,8 +14,10 @@ class IttiKoch():
     Itti and Koch main model class.
     Inputs upon init: path to the image, changes to setup dict
     '''
-    def __init__(self, input_params=None):
+    def __init__(self, input_params=None, verbose=True):
         super().__init__()
+
+        self.verbose = verbose
 
         # dictionary with default params
         self.params = {
@@ -29,6 +31,7 @@ class IttiKoch():
             "gabor_frequency": 0.1,
             "gabor_phase": False
         }
+
 
         # update the parameters with the input
         if input_params:
@@ -83,10 +86,12 @@ class IttiKoch():
         img = img_as_float64(img) # convert to doubles if image is uint8
 
         # compute spatial scales
-        print("Computing {} image scales".format(self.params["num_center_scales"]))
+        if self.verbose:
+            print("Computing {} image scales".format(self.params["num_center_scales"]))
         img_scales = self.make_center_scales(img, np.arange(self.params["num_center_scales"])+1)
 
-        print("Creating Gabor kernels for orientation.")
+        if self.verbose:
+            print("Creating Gabor kernels for orientation.")
         gabor_kernels = create_gabor_kernels(theta = self.params["gabor_theta"],
                                             sigma = self.params["gabor_sigma"],
                                             frequency = self.params["gabor_frequency"],
@@ -97,7 +102,8 @@ class IttiKoch():
 
         # iterate over features to compute (keys)
         for key in keys:
-            print("Computing saliency maps for {}.".format(key))
+            if self.verbose:
+                print("Computing saliency maps for {}.".format(key))
 
             # get corresponding function
             curr_func = globals()["compute_"+key]

@@ -102,7 +102,7 @@ def compute_nss(sal_map, fix_binary):
 def compute_similarity(sal_map, fix_map):
    
     # adjust the image size if it hasn't been done before
-    sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
+    sal_map, fix_map = adjust_image_size(sal_map, fix_map)
     
     # normalize both to match probability distributions
     fix_norm = fix_map / np.sum(fix_map)

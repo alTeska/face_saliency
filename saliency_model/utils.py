@@ -46,6 +46,30 @@ def center_bias(func, mapsize):
     return g
 
 
+def center_bias(func, mapsize):
+    """make matrix from function"""
+    g = np.zeros(mapsize)
+    for xi in range(0, mapsize[0]):
+        for yi in range(0,mapsize[1]):
+            x = xi-mapsize[0]/2
+            y = yi-mapsize[1]/2
+            g[xi, yi] = func(x, y)
+    # normalize to a height of one
+    g = g / np.max(g)
+    return g
+
+
+def fit_gauss_to_rectangle(top, bottom, right, left):
+    '''
+    input: top, bottom, right and left coordinates of the rectangle
+    Returns 2D distribution for saliency fit into the rectangle
+    '''
+    sigma = (bottom - top)/4
+    center = center_bias(lambda x, y: gaussian2D(x, y, sigma=sigma), (bottom-top, right-left))
+
+    return center
+
+
 def create_gabor_kernels(theta=4, sigma=4, frequency=0.1, phase=False):
     '''
     Function returns multiple Gabor Filters kernels. Theta defines how many
@@ -183,12 +207,12 @@ def compute_conspicuity_map(convolution_maps, mapsize, resize_map = True):
         # get local maxima of the map
         peak_avg, peak_num = get_local_maxima(m, min_distance=1)
         weights.append(get_weight_map(peak_avg, peak_num))
-        
+
         if (resize_map):
             m = resize(m, mapsize, mode='constant', anti_aliasing=True)
-            
+
         conspicuity_map += weights[i] * m
-        
+
     conspicuity_map = normalize(conspicuity_map)
 
     return conspicuity_map

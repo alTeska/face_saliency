@@ -1,6 +1,6 @@
 import numpy as np
 from skimage.transform import resize
-from utils import gaussian2D
+from utils import gaussian2D, center_bias
 
 
 def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], skip_auc = False):
@@ -161,13 +161,3 @@ def compute_information_gain(sal_map, fix_binary, baseline = []):
     return ig
 
 
-# TODO: basically a copy of the receptive field function - maybe combine them!
-def center_bias(func, mapsize):
-    """make matrix from function"""
-    g = np.zeros(mapsize)
-    for xi in range(0, mapsize[0]):
-        for yi in range(0,mapsize[1]):
-            x = xi-mapsize[0]/2
-            y = yi-mapsize[1]/2
-            g[xi, yi] = func(x, y)
-    return g

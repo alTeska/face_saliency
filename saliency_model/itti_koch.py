@@ -2,6 +2,7 @@
 import math
 import numpy as np
 import scipy.signal as signal
+from scipy import ndimage as nd
 import matplotlib.image as mpimg
 from skimage import img_as_float64
 
@@ -28,7 +29,9 @@ class IttiKoch():
             "gabor_theta": 4,
             "gabor_sigma": 4,
             "gabor_frequency": 0.1,
-            "gabor_phase": False
+            "gabor_phase": False,
+            "gaussian_blur": 2,
+            "fraction_centerbias": 2
         }
         
         # update the parameters with the input
@@ -114,8 +117,15 @@ class IttiKoch():
         saliency = np.zeros(self.params["mapsize"])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]
-            
-        # TODO introduce center bias
+        
+        # blur the image
+        saliency = nd.gaussian_filter(saliency, self.params["gaussian_blur"])
+        
+        # normalize with the maximum of the map
+        saliency = saliency / np.max(saliency)
+        
+        # introduce center bias
+        saliency = saliency * center_bias(lambda x, y: gaussian2D(x, y, min(np.shape(saliency)) / self.params["fraction_centerbias"]), np.shape(saliency))
 
         # return saliency
         return saliency, saliency_maps

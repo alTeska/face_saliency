@@ -32,6 +32,19 @@ def receptive_field_matrix(func):
             g[xi, yi] = func(x, y)
     return g
 
+# TODO: basically a copy of the receptive field function - combine them!
+def center_bias(func, mapsize):
+    """make matrix from function"""
+    g = np.zeros(mapsize)
+    for xi in range(0, mapsize[0]):
+        for yi in range(0,mapsize[1]):
+            x = xi-mapsize[0]/2
+            y = yi-mapsize[1]/2
+            g[xi, yi] = func(x, y)
+    # normalize to a height of one
+    g = g / np.max(g)
+    return g
+
 
 def create_gabor_kernels(theta=4, sigma=4, frequency=0.1, phase=False):
     '''

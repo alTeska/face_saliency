@@ -1,7 +1,8 @@
 # Basic features implemented by the Itti-Koch Algorithm
 
 import numpy as np
-from .utils import convolve_kernels
+# TODO change back!
+from utils import convolve_kernels
 
 
 def compute_intensity(img_list):

@@ -2,11 +2,13 @@
 import math
 import numpy as np
 import scipy.signal as signal
+from scipy import ndimage as nd
 import matplotlib.image as mpimg
 from skimage import img_as_float64
 
-from .utils import *
-from .itti_koch_features import *
+# TODO change back!
+from utils import *
+from itti_koch_features import *
 
 
 class IttiKoch():
@@ -27,7 +29,9 @@ class IttiKoch():
             "gabor_theta": 4,
             "gabor_sigma": 4,
             "gabor_frequency": 0.1,
-            "gabor_phase": False
+            "gabor_phase": False,
+            "gaussian_blur": 2,
+            "fraction_centerbias": 2
         }
         
         # update the parameters with the input
@@ -75,17 +79,17 @@ class IttiKoch():
 
         return conspicuity_map
 
-    def run(self, img, keys = ["intensity", "color", "orientation"]):
+    def run(self, img, keys = ["intensity", "color", "orientation"], verbose = False):
         '''
         Given an image returns its saliency and the single saliency maps in the order of feature  input
         '''
         img = img_as_float64(img) # convert to doubles if image is uint8
 
         # compute spatial scales
-        print("Computing {} image scales".format(self.params["num_center_scales"]))
+        if verbose: print("Computing {} image scales".format(self.params["num_center_scales"]))
         img_scales = self.make_center_scales(img, np.arange(self.params["num_center_scales"])+1)
         
-        print("Creating Gabor kernels for orientation.")
+        if verbose: print("Creating Gabor kernels for orientation.")
         gabor_kernels = create_gabor_kernels(theta = self.params["gabor_theta"],
                                             sigma = self.params["gabor_sigma"],
                                             frequency = self.params["gabor_frequency"],
@@ -96,7 +100,7 @@ class IttiKoch():
         
         # iterate over features to compute (keys)
         for key in keys:
-            print("Computing saliency maps for {}.".format(key))
+            if verbose: print("Computing saliency maps for {}.".format(key))
             
             # get corresponding function
             curr_func = globals()["compute_"+key]
@@ -113,6 +117,15 @@ class IttiKoch():
         saliency = np.zeros(self.params["mapsize"])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]
+        
+        # blur the image
+        saliency = nd.gaussian_filter(saliency, self.params["gaussian_blur"])
+        
+        # normalize with the maximum of the map
+        saliency = saliency / np.max(saliency)
+        
+        # introduce center bias
+        saliency = saliency * center_bias(lambda x, y: gaussian2D(x, y, min(np.shape(saliency)) / self.params["fraction_centerbias"]), np.shape(saliency))
 
         # return saliency
         return saliency, saliency_maps

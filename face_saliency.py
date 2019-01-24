@@ -1,10 +1,7 @@
-import math
-import cv2
 import face_recognition
 import numpy as np
 import matplotlib.pyplot as plt
 
-from PIL import Image
 from scipy import ndimage as nd
 from saliency_model.utils import fit_gauss_to_rectangle
 
@@ -33,9 +30,15 @@ def apply_face_saliency(image, face_locations, blur=2):
 
 
 image = face_recognition.load_image_file("imgs/group.jpg")
+print(np.shape(image))
+print(type(image))
+print(image.dtype)
 # image = face_recognition.load_image_file("imgs/biden.jpg")
-# image = face_recognition.load_image_file("/imgs/baby1.png")
-# image = face_recognition.load_image_file("/imgs/1.jpg")
+image = face_recognition.load_image_file("imgs/baby1.png")
+print(np.shape(image))
+print(type(image))
+print(image.dtype)
+# image = face_recognition.load_image_file("imgs/1.jpg")
 
 face_locations = face_recognition.face_locations(image)
 saliency = apply_face_saliency(image, face_locations)

@@ -6,7 +6,8 @@ from saliency_model.itti_koch import IttiKoch
 plt.rcParams['image.cmap'] = 'gray'
 
 # Load The Image
-path = './imgs/group.jpg'
+path = './imgs/baby1.png'
+# path = './imgs/group.jpg'
 img = mpimg.imread(path)
 
 params_ik = {
@@ -14,17 +15,21 @@ params_ik = {
 }
 
 features = ["intensity", "orientation", "color"]
-IK = IttiKoch(verbose=False)
-saliency, maps = IK.run(img, features)
+IK = IttiKoch(verbose=True)
+saliency, maps = IK.run(img, features, faces=True)
 
-fig, ax = plt.subplots(1, 4, figsize=(15, 5))
-ax[0].imshow(maps[0])
-ax[1].imshow(maps[1])
-ax[2].imshow(maps[2])
-ax[3].imshow(saliency)
-ax[0].set_title('intensity')
-ax[1].set_title('orientation')
-ax[2].set_title('color')
-ax[3].set_title('ICO')
+fig, ax = plt.subplots(2, 3, figsize=(15, 5))
+ax[0,0].imshow(img)
+ax[0,1].imshow(maps[0])
+ax[0,2].imshow(maps[1])
+ax[1,0].imshow(maps[2])
+ax[1,1].imshow(maps[3])
+ax[1,2].imshow(saliency)
+ax[0,0].set_title('image')
+ax[0,1].set_title('intensity')
+ax[0,2].set_title('orientation')
+ax[1,0].set_title('color')
+ax[1,1].set_title('faces')
+ax[1,2].set_title('ICO')
 
 plt.show()

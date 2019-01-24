@@ -44,20 +44,7 @@ def center_bias(func, mapsize):
     # normalize to a height of one
     g = g / np.max(g)
     return g
-
-
-def center_bias(func, mapsize):
-    """make matrix from function"""
-    g = np.zeros(mapsize)
-    for xi in range(0, mapsize[0]):
-        for yi in range(0,mapsize[1]):
-            x = xi-mapsize[0]/2
-            y = yi-mapsize[1]/2
-            g[xi, yi] = func(x, y)
-    # normalize to a height of one
-    g = g / np.max(g)
-    return g
-
+    
 
 def fit_gauss_to_rectangle(top, bottom, right, left):
     '''

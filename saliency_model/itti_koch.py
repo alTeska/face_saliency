@@ -25,7 +25,7 @@ class IttiKoch():
             "num_center_scales": 3,
             "outer_sigma": [3,6],
             "inner_sigma": [1,1],
-            "topdown_weights": [1,1,1],
+            "topdown_weights": [1,1,1,1],
             "gabor_theta": 4,
             "gabor_sigma": 4,
             "gabor_frequency": 0.1,
@@ -79,11 +79,11 @@ class IttiKoch():
 
         return conspicuity_map
 
-    def run(self, img, keys = ["intensity", "color", "orientation"]):
+    def run(self, img, keys = ["intensity", "color", "orientation"], faces=False):
         '''
         Given an image returns its saliency and the single saliency maps in the order of feature  input
         '''
-        img = img_as_float64(img) # convert to doubles if image is uint8
+        # img = img_as_float64(img) # convert to doubles if image is uint8
 
         # compute spatial scales
         if self.verbose:
@@ -108,14 +108,22 @@ class IttiKoch():
             # get corresponding function
             curr_func = globals()["compute_"+key]
 
+
             # compute conspicuity map
             if (key == "orientation"):
                 saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels))
             else:
                 saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func))
 
+
         # sum & normalize across channels
         wj = self.params["topdown_weights"]
+
+        # add faces detection into the model
+        if faces:
+            faces_saliency = compute_faces(img)
+            face_sal = downsample_image(faces_saliency, self.params["mapsize"][0], self.params["min_mapwidth"], [1])
+            saliency_maps.append(np.squeeze(face_sal))
 
         saliency = np.zeros(self.params["mapsize"])
         for i in np.arange(len(saliency_maps)):

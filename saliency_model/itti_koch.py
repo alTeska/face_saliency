@@ -79,17 +79,17 @@ class IttiKoch():
 
         return conspicuity_map
 
-    def run(self, img, keys = ["intensity", "color", "orientation"]):
+    def run(self, img, keys = ["intensity", "color", "orientation"], verbose = False):
         '''
         Given an image returns its saliency and the single saliency maps in the order of feature  input
         '''
         img = img_as_float64(img) # convert to doubles if image is uint8
 
         # compute spatial scales
-        print("Computing {} image scales".format(self.params["num_center_scales"]))
+        if verbose: print("Computing {} image scales".format(self.params["num_center_scales"]))
         img_scales = self.make_center_scales(img, np.arange(self.params["num_center_scales"])+1)
         
-        print("Creating Gabor kernels for orientation.")
+        if verbose: print("Creating Gabor kernels for orientation.")
         gabor_kernels = create_gabor_kernels(theta = self.params["gabor_theta"],
                                             sigma = self.params["gabor_sigma"],
                                             frequency = self.params["gabor_frequency"],
@@ -100,7 +100,7 @@ class IttiKoch():
         
         # iterate over features to compute (keys)
         for key in keys:
-            print("Computing saliency maps for {}.".format(key))
+            if verbose: print("Computing saliency maps for {}.".format(key))
             
             # get corresponding function
             curr_func = globals()["compute_"+key]

@@ -1,12 +1,64 @@
 import numpy as np
+import os
 from skimage.transform import resize
+import matplotlib.image as mpimg
+
 from utils import gaussian2D, center_bias
+from itti_koch import IttiKoch
+
+
+def run_dataset_analysis(path, sal_model, skip_auc = False):
+    
+    # construct the data paths
+    #data_path = os.path.join(dataset, "images/train")
+    data_path = os.path.join(path, "pipeline_test")
+    fix_path = os.path.join(path, "fixation_maps/train")
+    
+    # get the training files
+    filenames = os.listdir(data_path)
+    num_files = len(filenames)
+    print(filenames)
+    
+    # initialize the model first: should be the same for all images
+    if sal_model == "Itti Koch": itti_koch = IttiKoch({})
+
+    # initialize the score arrays
+    nss = np.full(num_files, np.nan)
+    sim = np.full(num_files, np.nan)
+    ig = np.full(num_files, np.nan)
+    auc = np.full(num_files, np.nan)
+
+    for f,i in zip(filenames, np.arange(num_files)):
+        print("Filename: {}".format(f))
+        
+        try:
+            image = mpimg.imread(os.path.join(data_path, f))
+        except:
+            print("Image at path {} could not be found.".format(data_path))
+            continue
+
+        # get corresponding fixation map
+        filename = f.split('.')[0] + '.png'
+
+        try:
+            fix_map = mpimg.imread(os.path.join(fix_path, filename))
+        except:
+            print("Fixation Map at path {} could not be found.".format(fix_path))
+            continue
+
+        # compute saliency map with model
+        if sal_model == "Itti Koch": sal_map, temp = itti_koch.run(image)
+
+        nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, fix_map, skip_auc = skip_auc)
+        
+    return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)
 
 
 def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], skip_auc = False):
     '''
     Computes the score-value for all metrics. Only scores computed, for additional information,
     run the single function.
+    Output: NSS, SIM, IG, AUC
     '''
     
     fix_binary = fix_binary if list(fix_binary) else fix_map > 0

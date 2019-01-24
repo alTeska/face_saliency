@@ -7,6 +7,13 @@ from itti_koch import IttiKoch
 from metrics import auc_judd_score
 
 
+path = "C:\\Users\\thier\\Documents\\Studium\\MSNE\\18-19 WS\\NISE\\project\\MS COCO"
+
+nss_score, sim_score, ig_score, auc_score = run_dataset_analysis(path, "Itti Koch", skip_auc = True)
+
+print(nss_score, sim_score, ig_score, auc_score)
+
+'''
 # Load example Image
 path = '../imgs/d91.jpg'
 fix_map = mpimg.imread(path)
@@ -44,3 +51,4 @@ print("Information Gain: {}".format(ig))
 
 # compute all of them:
 # nss, sim, info_gain, auc = compute_all_metrics(sal_map=sal_map, fix_map=fix_map)
+'''

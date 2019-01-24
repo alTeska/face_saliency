@@ -83,20 +83,9 @@ def compute_faces(img):
     Computes saliency map for faces
     '''
 
-
     img1 = skimage.img_as_ubyte(img[:,:,0:3])
 
     face_locations = face_recognition.face_locations(img1)
     saliency = apply_face_saliency(img, face_locations)
 
-
-    # print(img1.dtype, '\n')
-    # print(img.dtype, '\n')
-    # print(np.shape(img1), '\n')
-    # import matplotlib.pyplot as plt
-    # fig, ax = plt.subplots(ncols=2, nrows=1)
-    # ax[0].imshow(img1[:,:,0])
-    # ax[1].imshow(img1[:,:,1])
-    # plt.show()
-    
     return saliency

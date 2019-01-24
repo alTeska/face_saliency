@@ -6,30 +6,8 @@ import matplotlib.pyplot as plt
 
 from PIL import Image
 from scipy import ndimage as nd
-from saliency_model.utils import gaussian2D, mexican_hat
+from saliency_model.utils import fit_gauss_to_rectangle
 
-def center_bias(func, mapsize):
-    """make matrix from function"""
-    g = np.zeros(mapsize)
-    for xi in range(0, mapsize[0]):
-        for yi in range(0,mapsize[1]):
-            x = xi-mapsize[0]/2
-            y = yi-mapsize[1]/2
-            g[xi, yi] = func(x, y)
-    # normalize to a height of one
-    g = g / np.max(g)
-    return g
-
-
-def fit_gaussian_rectangle(top, bottom, right, left):
-    '''
-    input: top, bottom, right and left coordinates of the rectangle
-    Returns 2D distribution for saliency fit into the rectangle
-    '''
-    sigma = (bottom - top)/4
-    center = center_bias(lambda x, y: gaussian2D(x, y, sigma=sigma), (bottom-top, right-left))
-
-    return center
 
 
 def apply_face_saliency(image, face_locations, blur=2):
@@ -43,7 +21,7 @@ def apply_face_saliency(image, face_locations, blur=2):
     for face_location in face_locations:
         # get all the face location and fit the gaussian into it
         top, right, bottom, left = face_location
-        center = fit_gaussian_rectangle(top, bottom, right, left)
+        center = fit_gauss_to_rectangle(top, bottom, right, left)
 
         # overwrtie the face are with gaussian
         face_saliency[top:bottom, left:right] = center
@@ -53,7 +31,9 @@ def apply_face_saliency(image, face_locations, blur=2):
     return saliency
 
 
-image = face_recognition.load_image_file("imgs/biden.jpg")
+
+image = face_recognition.load_image_file("imgs/group.jpg")
+# image = face_recognition.load_image_file("imgs/biden.jpg")
 # image = face_recognition.load_image_file("/imgs/baby1.png")
 # image = face_recognition.load_image_file("/imgs/1.jpg")
 

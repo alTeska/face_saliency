@@ -7,7 +7,6 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import skimage
-
 import pysaliency
 import pysaliency.external_datasets
 from pysaliency.utils import MatlabOptions

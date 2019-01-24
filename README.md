@@ -24,4 +24,7 @@ Additional optional features:
 5) Motion detection (Frame differencing, MOG, MOG2) [6]
 6) Motion tracking (Particle filter) [6]
 
-Meaningless sentence.
+
+## Dependancies:
+pysaliency
+face_recognition

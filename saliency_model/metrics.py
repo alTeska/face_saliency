@@ -1,5 +1,30 @@
 import numpy as np
 from skimage.transform import resize
+from utils import gaussian2D
+
+
+def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], skip_auc = False):
+    '''
+    Computes the score-value for all metrics. Only scores computed, for additional information,
+    run the single function.
+    '''
+    
+    fix_binary = fix_binary if list(fix_binary) else fix_map > 0
+    fix_map = fix_map if list(fix_map) else fix_binary
+        
+    # adjust the image sizes for further computations
+    sal_map, fix_map = adjust_image_size(sal_map, fix_map)
+    
+    if skip_auc:
+        auc_score = 0
+    else:
+        auc_score, temp, temp, temp = auc_judd_score(sal_map, fix_binary)
+        
+    nss = compute_nss(sal_map, fix_binary)
+    sim_score = compute_similarity(sal_map, fix_map)
+    info_gain = compute_information_gain(sal_map, fix_binary, baseline)
+    
+    return nss, sim_score, info_gain, auc_score
 
 
 def auc_judd_score(sal_map, fix_map):
@@ -110,3 +135,39 @@ def compute_similarity(sal_map, fix_map):
     
     # sum over the minima of both normalized maps
     return np.sum(np.minimum(fix_norm, sal_norm))
+
+
+def compute_information_gain(sal_map, fix_binary, baseline = []):
+    '''
+    Computes the information gain of the saliency map over the baseline. If no baseline is provided,
+    the information gain over the center bias is computed.
+    '''
+    # adjust image size if it hasn't happened before
+    sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
+    
+    # create center bias baseline if no baseline provided
+    baseline = baseline if list(baseline) else center_bias(lambda x, y: gaussian2D(x, y, 100), np.shape(fix_binary))
+    
+    # bring the maps to probability distribution
+    sal_map = sal_map - np.min(sal_map)
+    sal_map = sal_map / np.sum(sal_map)
+    baseline = baseline - np.min(baseline)
+    baseline = baseline / np.sum(baseline)
+    
+    # compute information gain
+    epsilon = np.finfo('float64').eps
+    ig = np.sum(fix_binary * (np.log2(epsilon + sal_map) - np.log2(epsilon + baseline))) / np.sum(fix_binary)
+    
+    return ig
+
+
+# TODO: basically a copy of the receptive field function - maybe combine them!
+def center_bias(func, mapsize):
+    """make matrix from function"""
+    g = np.zeros(mapsize)
+    for xi in range(0, mapsize[0]):
+        for yi in range(0,mapsize[1]):
+            x = xi-mapsize[0]/2
+            y = yi-mapsize[1]/2
+            g[xi, yi] = func(x, y)
+    return g

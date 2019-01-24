@@ -114,6 +114,8 @@ class IttiKoch():
         saliency = np.zeros(self.params["mapsize"])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]
+            
+        # TODO introduce center bias
 
         # return saliency
         return saliency, saliency_maps

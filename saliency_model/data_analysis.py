@@ -11,9 +11,6 @@ from metrics import auc_judd_score
 path = '../imgs/d91.jpg'
 fix_map = mpimg.imread(path)
 
-# create binary fixation
-fix_binary = fix_map > 0
-
 # create prediction
 path = '../imgs/91.jpg'
 img = mpimg.imread(path)
@@ -23,7 +20,8 @@ sal_map, temp = IK.run(img)
 
 # adjust the image sizes for further computations
 sal_map, fix_map = adjust_image_size(sal_map, fix_map)
-
+# create binary fixation
+fix_binary = fix_map > 0
 
 # (1) AUC metric
 auc_score, tp, fp, thresholds = auc_judd_score(sal_map, fix_binary)
@@ -39,3 +37,10 @@ print("NSS: {}".format(nss_score))
 # (3) Similarity metric
 sim_score = compute_similarity(sal_map, fix_map)
 print("SIM: {}".format(sim_score))
+
+# (4) Information Gain:
+ig = compute_information_gain(sal_map, fix_binary)
+print("Information Gain: {}".format(ig))
+
+# compute all of them:
+# nss, sim, info_gain, auc = compute_all_metrics(sal_map=sal_map, fix_map=fix_map)

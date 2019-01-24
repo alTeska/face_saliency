@@ -82,11 +82,7 @@ class IttiKoch():
 
         return conspicuity_map
 
-<<<<<<< 5408f8f14e524e53c8537d7891f3cf2d1cd4876b
-    def run(self, img, keys = ["intensity", "color", "orientation"], verbose = False):
-=======
     def run(self, img, keys = ["intensity", "color", "orientation"], faces=False):
->>>>>>> face added to IK as a separate flag
         '''
         Given an image returns its saliency and the single saliency maps in the order of feature  input
         '''

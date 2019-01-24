@@ -1,13 +1,8 @@
 # Basic features implemented by the Itti-Koch Algorithm
 import skimage
 import numpy as np
-<<<<<<< 5408f8f14e524e53c8537d7891f3cf2d1cd4876b
-# TODO change back!
-from utils import convolve_kernels
-=======
 import face_recognition
 from .utils import convolve_kernels, fit_gauss_to_rectangle
->>>>>>> face added to IK as a separate flag
 
 
 def compute_intensity(img_list):
@@ -88,9 +83,20 @@ def compute_faces(img):
     Computes saliency map for faces
     '''
 
+
     img1 = skimage.img_as_ubyte(img[:,:,0:3])
 
     face_locations = face_recognition.face_locations(img1)
     saliency = apply_face_saliency(img, face_locations)
+
+
+    # print(img1.dtype, '\n')
+    # print(img.dtype, '\n')
+    # print(np.shape(img1), '\n')
+    # import matplotlib.pyplot as plt
+    # fig, ax = plt.subplots(ncols=2, nrows=1)
+    # ax[0].imshow(img1[:,:,0])
+    # ax[1].imshow(img1[:,:,1])
+    # plt.show()
 
     return saliency

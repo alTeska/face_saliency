@@ -14,6 +14,7 @@ params_ik = {
 }
 
 features = ["intensity", "orientation", "color"]
+IK = IttiKoch()
 saliency, maps = IK.run(img, features)
 
 fig, ax = plt.subplots(1, 4, figsize=(15, 5))

@@ -16,9 +16,9 @@ class IttiKoch():
     Itti and Koch main model class.
     Inputs upon init: path to the image, changes to setup dict
     '''
-    def __init__(self, input_params):
+    def __init__(self, input_params=None):
         super().__init__()
-        
+
         # dictionary with default params
         self.params = {
             "min_mapwidth": 64,
@@ -33,12 +33,13 @@ class IttiKoch():
             "gaussian_blur": 2,
             "fraction_centerbias": 2
         }
-        
-        # update the parameters with the input
-        for key in input_params:
-            self.params[key] = input_params[key]
 
-        pass
+        # update the parameters with the input
+        if input_params:
+            for key in input_params:
+                self.params[key] = input_params[key]
+
+            pass
 
 
     def make_center_scales(self, img, scalars):
@@ -88,7 +89,7 @@ class IttiKoch():
         # compute spatial scales
         if verbose: print("Computing {} image scales".format(self.params["num_center_scales"]))
         img_scales = self.make_center_scales(img, np.arange(self.params["num_center_scales"])+1)
-        
+
         if verbose: print("Creating Gabor kernels for orientation.")
         gabor_kernels = create_gabor_kernels(theta = self.params["gabor_theta"],
                                             sigma = self.params["gabor_sigma"],
@@ -97,14 +98,14 @@ class IttiKoch():
 
         # compute conspicuity_map for each channel
         saliency_maps = []
-        
+
         # iterate over features to compute (keys)
         for key in keys:
             if verbose: print("Computing saliency maps for {}.".format(key))
-            
+
             # get corresponding function
             curr_func = globals()["compute_"+key]
-            
+
             # compute conspicuity map
             if (key == "orientation"):
                 saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels))
@@ -113,17 +114,17 @@ class IttiKoch():
 
         # sum & normalize across channels
         wj = self.params["topdown_weights"]
-        
+
         saliency = np.zeros(self.params["mapsize"])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]
-        
+
         # blur the image
         saliency = nd.gaussian_filter(saliency, self.params["gaussian_blur"])
-        
+
         # normalize with the maximum of the map
         saliency = saliency / np.max(saliency)
-        
+
         # introduce center bias
         saliency = saliency * center_bias(lambda x, y: gaussian2D(x, y, min(np.shape(saliency)) / self.params["fraction_centerbias"]), np.shape(saliency))
 

@@ -2,7 +2,6 @@ import math
 import warnings
 import numpy as np
 import scipy.signal as signal
-import matplotlib.pyplot as plt
 import skimage.transform as transform
 
 from skimage.feature import peak_local_max

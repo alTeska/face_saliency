@@ -1,13 +1,7 @@
 # development file, later on itti&koch class
-import math
 import numpy as np
-# import scipy.signal as signal
-# import matplotlib.image as mpimg
-# from skimage import img_as_float64
 from scipy import ndimage as nd
 from skimage.transform import resize
-
-
 from .utils import *
 from .itti_koch_features import *
 

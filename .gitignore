@@ -4,7 +4,8 @@ saliency_model/__pycache__/*
 /other
 /test_models
 /model_caches
-
+/data
+/deep_gaze
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

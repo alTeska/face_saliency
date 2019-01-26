@@ -1,6 +1,5 @@
 import os
 import warnings
-import skimage
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -35,7 +34,6 @@ covsal = pysaliency.CovSal(location='test_models', cache_location=os.path.join('
 gbvs = pysaliency.GBVS(location='test_models', cache_location=os.path.join('model_caches', 'GBVS'))
 gbvs_ik = pysaliency.GBVSIttiKoch(location='test_models', cache_location=os.path.join('model_caches', 'GBVS'))
 
-# calculate saliency
 pbar = tqdm(total=100)
 
 # run deep gaze models

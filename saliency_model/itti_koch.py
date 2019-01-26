@@ -119,8 +119,6 @@ class IttiKoch():
 
         # add faces detection into the model
         if faces:
-            # faces_saliency = compute_faces(img)
-            # face_sal = downsample_image(faces_saliency, self.params["mapsize"][0], self.params["min_mapwidth"], [1])
             face_sal = compute_faces(img)
             saliency_maps.append(np.squeeze(face_sal))
 

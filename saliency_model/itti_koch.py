@@ -1,10 +1,12 @@
 # development file, later on itti&koch class
 import math
 import numpy as np
-import scipy.signal as signal
+# import scipy.signal as signal
+# import matplotlib.image as mpimg
+# from skimage import img_as_float64
 from scipy import ndimage as nd
-import matplotlib.image as mpimg
-from skimage import img_as_float64
+from skimage.transform import resize
+
 
 from .utils import *
 from .itti_koch_features import *
@@ -86,7 +88,8 @@ class IttiKoch():
         '''
         Given an image returns its saliency and the single saliency maps in the order of feature  input
         '''
-        # img = img_as_float64(img) # convert to doubles if image is uint8
+        # save image size
+        img_size = np.shape(img)
 
         # compute spatial scales
         if self.verbose:
@@ -114,21 +117,23 @@ class IttiKoch():
 
             # compute conspicuity map
             if (key == "orientation"):
-                saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels))
+                m = self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels)
+                saliency_maps.append(resize(m, img_size[0:2], mode='constant', anti_aliasing=True))
             else:
-                saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func))
-
+                m = self.make_conspicuity_maps(img_scales, curr_func)
+                saliency_maps.append(resize(m, img_size[0:2], mode='constant', anti_aliasing=True))
 
         # add faces detection into the model
         if faces:
-            faces_saliency = compute_faces(img)
-            face_sal = downsample_image(faces_saliency, self.params["mapsize"][0], self.params["min_mapwidth"], [1])
+            # faces_saliency = compute_faces(img)
+            # face_sal = downsample_image(faces_saliency, self.params["mapsize"][0], self.params["min_mapwidth"], [1])
+            face_sal = compute_faces(img)
             saliency_maps.append(np.squeeze(face_sal))
 
         # sum & normalize across channels
         wj = self.params["topdown_weights"]
 
-        saliency = np.zeros(self.params["mapsize"])
+        saliency = np.zeros(img_size[0:2])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]
 

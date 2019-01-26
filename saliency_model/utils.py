@@ -45,7 +45,7 @@ def center_bias(func, mapsize):
     g = g / np.max(g)
 
     return g
-    
+
 
 def fit_gauss_to_rectangle(top, bottom, right, left):
     '''

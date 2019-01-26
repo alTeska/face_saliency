@@ -43,6 +43,7 @@ def center_bias(func, mapsize):
             g[xi, yi] = func(x, y)
     # normalize to a height of one
     g = g / np.max(g)
+
     return g
     
 

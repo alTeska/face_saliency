@@ -4,6 +4,7 @@ saliency_model/__pycache__/*
 /other
 /test_models
 /model_caches
+/coco
 
 
 # Byte-compiled / optimized / DLL files

@@ -4,52 +4,51 @@ from skimage.transform import resize
 import matplotlib.image as mpimg
 
 from utils import gaussian2D, center_bias
-from itti_koch import IttiKoch
 
 
-def run_dataset_analysis(path, sal_model, skip_auc = False):
+def run_dataset_analysis(gt_paths, sal_paths, skip_auc = False):
     
     # construct the data paths
     #data_path = os.path.join(dataset, "images/train")
-    data_path = os.path.join(path, "pipeline_test")
-    fix_path = os.path.join(path, "fixation_maps/train")
+    #data_path = os.path.join(path, "pipeline_test")
+    #fix_path = os.path.join(path, "fixation_maps/train")
     
     # get the training files
-    filenames = os.listdir(data_path)
-    num_files = len(filenames)
-    print(filenames)
+    #filenames = os.listdir(data_path)
+    #num_files = len(filenames)
+    #print(filenames)
     
-    # initialize the model first: should be the same for all images
-    if sal_model == "Itti Koch": itti_koch = IttiKoch({})
-
+    num_files = len(gt_paths)
+    
     # initialize the score arrays
     nss = np.full(num_files, np.nan)
     sim = np.full(num_files, np.nan)
     ig = np.full(num_files, np.nan)
     auc = np.full(num_files, np.nan)
-
-    for f,i in zip(filenames, np.arange(num_files)):
-        print("Filename: {}".format(f))
-        
+    
+    sal = sal_paths
+    for gt,i in zip(gt_paths, np.arange(num_files)):
+    #for gt,sal in zip(gt_paths, sal_paths):
         try:
-            image = mpimg.imread(os.path.join(data_path, f))
+             sal_map = mpimg.imread(sal)
         except:
-            print("Image at path {} could not be found.".format(data_path))
+            print("Image at path {} could not be found.".format(sal))
             continue
 
         # get corresponding fixation map
-        filename = f.split('.')[0] + '.png'
+        #filename = f.split('.')[0] + '.png'
 
         try:
-            fix_map = mpimg.imread(os.path.join(fix_path, filename))
+            gt_map = mpimg.imread(gt)
         except:
-            print("Fixation Map at path {} could not be found.".format(fix_path))
+            print("Fixation Map at path {} could not be found.".format(gt))
             continue
 
         # compute saliency map with model
-        if sal_model == "Itti Koch": sal_map, temp = itti_koch.run(image)
+        #if sal_model == "Itti Koch": sal_map, temp = itti_koch.run(image)
 
-        nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, fix_map, skip_auc = skip_auc)
+        nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, gt_map, skip_auc = skip_auc)
+        print(nss[i], sim[i], ig[i], auc[i])
         
     return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)
 

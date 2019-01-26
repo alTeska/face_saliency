@@ -4,11 +4,13 @@ import numpy as np
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 import skimage.transform as transform
+import os
 
 from skimage.feature import peak_local_max
 from skimage.transform import resize
 from skimage.filters import gabor_kernel
 from scipy import ndimage as nd
+from pycocotools.coco import COCO
 
 
 def gaussian2D(x, y, sigma):
@@ -203,3 +205,50 @@ def compute_conspicuity_map(convolution_maps, mapsize, resize_map = True):
     conspicuity_map = normalize(conspicuity_map)
 
     return conspicuity_map
+
+
+def get_dataset_ids(path):
+    filenames = os.listdir(path)
+
+    ds_ids = []
+    for file in filenames:
+        ds_ids.append(int(file.split('_')[2].split('.')[0]))
+    
+    return ds_ids  
+
+
+def get_context_saliencymaps(context, dataDir):
+    
+    dataType='val2014'
+    annFile='{}\\annotations\\instances_{}.json'.format(dataDir,dataType)
+    
+    # initialize COCO api for instance annotations
+    coco = COCO(annFile)
+    
+    # get all categories associated with context
+    ids = coco.getCatIds(supNms=context)
+    
+    # loop through the categories and get corresponding image IDs
+    imgIds = []
+    for curr_id in ids:
+        imgIds = np.append(imgIds, coco.getImgIds(catIds=curr_id), axis=0)
+    
+    # delete duplicates in case there are some
+    coco_ids =  list(set(imgIds))
+    
+    ds_ids = get_dataset_ids(os.path.join(dataDir, "images"))
+    final_ids = np.intersect1d(coco_ids, ds_ids).astype(int)
+    
+    # get images corresponding to ids
+    images = coco.loadImgs(final_ids)
+    
+    gt_paths = []
+    sal_paths = []
+    
+    # get corresponding paths (in pairs?)
+    for img in images: 
+        filename = img['file_name'].split('.')[0]
+        gt_paths.append(os.path.join(dataDir, "fixation_maps", filename + ".png"))
+        # sal_paths
+    
+    return gt_paths, sal_paths

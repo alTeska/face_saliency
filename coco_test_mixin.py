@@ -1,4 +1,6 @@
 import os
+import gc
+import shutil
 import warnings
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,6 +30,8 @@ def save_plot_without_frames(img, directory):
 
     fig.savefig(directory, bbox_inches='tight', pad_inches=0, transparent=True);
 
+    plt.close(fig)
+    gc.collect()
     pass
 
 
@@ -64,12 +68,12 @@ cas = pysaliency.ContextAwareSaliency(location='test_models', cache_location=os.
 covsal = pysaliency.CovSal(location='test_models', cache_location=os.path.join('model_caches', 'CovSal'))
 gbvs = pysaliency.GBVS(location='test_models', cache_location=os.path.join('model_caches', 'GBVS'))
 
-fnames = fnames[0:1]
+# fnames = fnames[0:1]
 for fname in tqdm(fnames):
     name = fname[10:-4]  # get just the name of the picture
     img = mpimg.imread(fname)
 
-    pbar = tqdm(total=90)
+    pbar = tqdm(total=100)
 
     # run basic models
     smap_ik, _ = IK.run(img)
@@ -134,5 +138,8 @@ for fname in tqdm(fnames):
     save_plot_without_frames(smap_covsal_face, path + 'covsal_face/' + name + '.jpg')
     save_plot_without_frames(smap_gbvs_face, path + 'gbvs_face/' + name + '.jpg')
     save_plot_without_frames(smap_icf_face, path + 'icf_face/' + name + '.jpg')
+
+    pbar.update(10)
+    shutil.move(fname, 'data/test/done')
 
     pbar.close()

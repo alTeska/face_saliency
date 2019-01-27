@@ -2,6 +2,7 @@
 import skimage
 import numpy as np
 import face_recognition
+from scipy import ndimage as nd
 from .utils import convolve_kernels, fit_gauss_to_rectangle
 
 
@@ -62,8 +63,6 @@ def apply_face_saliency(image, face_locations):
     '''
     Function creates a saliency map for face recognition feature, based on pre-detected face locations
     '''
-    # TODO: add blur ?
-
     face_saliency = np.zeros_like(image[:,:,0], dtype='float64')
 
     for face_location in face_locations:
@@ -74,7 +73,8 @@ def apply_face_saliency(image, face_locations):
         # overwrtie the face are with gaussian
         face_saliency[top:bottom, left:right] = center
 
-    # face_saliency = nd.gaussian_filter(face_saliency, blur)
+    # TODO: blur ?
+    face_saliency = nd.gaussian_filter(face_saliency, 20)
     return face_saliency
 
 

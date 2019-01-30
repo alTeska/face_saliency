@@ -78,13 +78,16 @@ def apply_face_saliency(image, face_locations):
     return face_saliency
 
 
-def compute_faces(img):
+def compute_faces(img, model=None):
     '''
     Computes saliency map for faces
     '''
     img1 = skimage.img_as_ubyte(img[:,:,0:3])
 
-    face_locations = face_recognition.face_locations(img1)
+    if model=='cnn':
+        face_locations = face_recognition.face_locations(img1, model='cnn')
+    else:
+        face_locations = face_recognition.face_locations(img1)
     saliency = apply_face_saliency(img, face_locations)
 
     return saliency

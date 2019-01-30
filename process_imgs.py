@@ -6,16 +6,19 @@ from saliency_model.itti_koch import IttiKoch
 plt.rcParams['image.cmap'] = 'gray'
 
 # Load The Image
-path = './imgs/baby1.png'
+# path = './imgs/baby1.png'
+path = './data/coco/images/COCO_val2014_000000000675.jpg'
+
 img = mpimg.imread(path)
 print(np.shape(img))
 
 params_ik = {
-    "mapwidth": 64
+    "mapwidth": 64,
+    "gaussian_blur": 20,
 }
 
 features = ["intensity", "orientation", "color"]
-IK = IttiKoch()
+IK = IttiKoch(input_params=params_ik)
 saliency, maps = IK.run(img, features, faces=True)
 
 print(np.shape(saliency))

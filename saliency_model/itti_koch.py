@@ -28,7 +28,8 @@ class IttiKoch():
             "gabor_frequency": 0.1,
             "gabor_phase": False,
             "gaussian_blur": 2,
-            "fraction_centerbias": 2
+            "fraction_centerbias": 2,
+            'face_model': None,
         }
 
 
@@ -119,7 +120,7 @@ class IttiKoch():
 
         # add faces detection into the model
         if faces:
-            face_sal = compute_faces(img)
+            face_sal = compute_faces(img, self.params['face_model'])
             saliency_maps.append(np.squeeze(face_sal))
 
         # sum & normalize across channels

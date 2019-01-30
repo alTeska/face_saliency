@@ -1,7 +1,6 @@
 # Basic features implemented by the Itti-Koch Algorithm
 import skimage
 import numpy as np
-import face_recognition
 from scipy import ndimage as nd
 from .utils import convolve_kernels, fit_gauss_to_rectangle
 
@@ -82,6 +81,8 @@ def compute_faces(img, model=None):
     '''
     Computes saliency map for faces
     '''
+    import face_recognition
+
     img1 = skimage.img_as_ubyte(img[:,:,0:3])
 
     if model=='cnn':

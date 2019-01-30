@@ -1,56 +1,11 @@
 import numpy as np
 import os
 from skimage.transform import resize
-import matplotlib.image as mpimg
 
 from utils import gaussian2D, center_bias
 
 
-def run_dataset_analysis(gt_paths, sal_paths, skip_auc = False):
-    
-    # construct the data paths
-    #data_path = os.path.join(dataset, "images/train")
-    #data_path = os.path.join(path, "pipeline_test")
-    #fix_path = os.path.join(path, "fixation_maps/train")
-    
-    # get the training files
-    #filenames = os.listdir(data_path)
-    #num_files = len(filenames)
-    #print(filenames)
-    
-    num_files = len(gt_paths)
-    
-    # initialize the score arrays
-    nss = np.full(num_files, np.nan)
-    sim = np.full(num_files, np.nan)
-    ig = np.full(num_files, np.nan)
-    auc = np.full(num_files, np.nan)
-    
-    sal = sal_paths
-    for gt,i in zip(gt_paths, np.arange(num_files)):
-    #for gt,sal in zip(gt_paths, sal_paths):
-        try:
-             sal_map = mpimg.imread(sal)
-        except:
-            print("Image at path {} could not be found.".format(sal))
-            continue
 
-        # get corresponding fixation map
-        #filename = f.split('.')[0] + '.png'
-
-        try:
-            gt_map = mpimg.imread(gt)
-        except:
-            print("Fixation Map at path {} could not be found.".format(gt))
-            continue
-
-        # compute saliency map with model
-        #if sal_model == "Itti Koch": sal_map, temp = itti_koch.run(image)
-
-        nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, gt_map, skip_auc = skip_auc)
-        print(nss[i], sim[i], ig[i], auc[i])
-        
-    return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)
 
 
 def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], skip_auc = False):

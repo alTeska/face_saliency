@@ -46,8 +46,8 @@ fnames = glob('data/test/*.jpg')
 
 # take care of directories
 directories = ['IK', 'faces',  'aim', 'sun', 'cas', 'covsal', 'gbvs', 'dg',
-               'icf', 'ik_face', 'aim_face', 'sun_face', 'cas_face',
-               'covsal_face', 'gbvs_face', 'icf_face']
+'icf', 'ik_face', 'aim_face', 'sun_face', 'cas_face',
+'covsal_face', 'gbvs_face', 'icf_face']
 
 if not os.path.exists(path):
     os.makedirs(path)
@@ -68,7 +68,7 @@ cas = pysaliency.ContextAwareSaliency(location='test_models', cache_location=os.
 covsal = pysaliency.CovSal(location='test_models', cache_location=os.path.join('model_caches', 'CovSal'))
 gbvs = pysaliency.GBVS(location='test_models', cache_location=os.path.join('model_caches', 'GBVS'))
 
-# fnames = fnames[0:1]
+fnames = fnames[0:2]
 for fname in tqdm(fnames):
     name = fname[10:-4]  # get just the name of the picture
     img = mpimg.imread(fname)

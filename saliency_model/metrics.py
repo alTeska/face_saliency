@@ -8,7 +8,7 @@ from utils import gaussian2D, center_bias
 
 
 
-def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], skip_auc = False):
+def compute_all_metrics(sal_map, metrics, fix_map = [], fix_binary = [], baseline = []):
     '''
     Computes the score-value for all metrics. Only scores computed, for additional information,
     run the single function.
@@ -21,14 +21,25 @@ def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], s
     # adjust the image sizes for further computations
     sal_map, fix_map = adjust_image_size(sal_map, fix_map)
     
-    if skip_auc:
-        auc_score = 0
-    else:
+    if 'auc' in metrics:
         auc_score, temp, temp, temp = auc_judd_score(sal_map, fix_binary)
+    else:
+        auc_score = 0
         
-    nss = compute_nss(sal_map, fix_binary)
-    sim_score = compute_similarity(sal_map, fix_map)
-    info_gain = compute_information_gain(sal_map, fix_binary, baseline)
+    if 'nss' in metrics: 
+        nss = compute_nss(sal_map, fix_binary)
+    else:
+        nss = 0
+    
+    if 'sim' in metrics:
+        sim_score = compute_similarity(sal_map, fix_map)
+    else:
+        sim_score = 0
+        
+    if 'ig' in metrics:
+        info_gain = compute_information_gain(sal_map, fix_binary, baseline)
+    else:
+        info_gain = 0
     
     return nss, sim_score, info_gain, auc_score
 
@@ -36,7 +47,6 @@ def compute_all_metrics(sal_map, fix_map = [], fix_binary = [], baseline = [], s
 def auc_judd_score(sal_map, fix_map):
     '''
     Computes the AUC of the saliency map and the fixation map according to Judd et al. 
-    TODO: more explanation here?
     '''
     
     # scale both images to the size of fixation map
@@ -152,7 +162,7 @@ def compute_information_gain(sal_map, fix_binary, baseline = []):
     sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
     
     # create center bias baseline if no baseline provided
-    baseline = baseline if list(baseline) else center_bias(lambda x, y: gaussian2D(x, y, 100), np.shape(fix_binary))
+    baseline = baseline if list(baseline) else center_bias(lambda x, y: gaussian2D(x, y, 50), np.shape(fix_binary))
     
     # bring the maps to probability distribution
     sal_map = sal_map - np.min(sal_map)

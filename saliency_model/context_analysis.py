@@ -2,8 +2,10 @@ import os
 import numpy as np
 import matplotlib.image as mpimg
 from pycocotools.coco import COCO
+import scipy.io as sio
+from tqdm import tqdm
 
-from metrics import compute_all_metrics
+from metrics import compute_all_metrics, center_bias, gaussian2D
 
 
 def get_dataset_ids(path):
@@ -14,6 +16,24 @@ def get_dataset_ids(path):
         ds_ids.append(int(file.split('_')[2].split('.')[0]))
 
     return ds_ids
+
+
+def create_binary_fixation(path):
+    fix = sio.loadmat(path)
+    
+    fix_gaze = fix['gaze'][0][0][0]
+    x = fix_gaze[:,0].astype(int)   # width
+    y = fix_gaze[:,1].astype(int)   # height
+    
+    height = fix['resolution'][0][0]
+    width = fix['resolution'][0][1]
+    
+    fix_binary = np.zeros((height, width))
+    
+    for xi,yi in zip(x,y):
+        fix_binary[yi-1, xi-1] = 1
+    
+    return fix_binary
 
 
 class ContextAnalysis():
@@ -36,6 +56,7 @@ class ContextAnalysis():
         # datapaths for ground truth and saliency predictions
         self.gt_paths = []
         self.sal_paths = []
+        self.fix_paths = []
 
     def instantiate_coco(self):
         """
@@ -56,13 +77,16 @@ class ContextAnalysis():
         :param model:
         :return:
         """
-        # get all categories associated with context
-        ids = self.coco.getCatIds(supNms=context)
+        if context == 'none':
+            imgIds = self.coco.getImgIds()
+        else:
+            # get all categories associated with context
+            ids = self.coco.getCatIds(supNms=context)
 
-        # loop through the categories and get corresponding image IDs
-        imgIds = []
-        for curr_id in ids:
-            imgIds = np.append(imgIds, self.coco.getImgIds(catIds=curr_id), axis=0)
+            # loop through the categories and get corresponding image IDs
+            imgIds = []
+            for curr_id in ids:
+                imgIds = np.append(imgIds, self.coco.getImgIds(catIds=curr_id), axis=0)
 
         # delete duplicates in case there are some
         coco_ids = list(set(imgIds))
@@ -79,6 +103,7 @@ class ContextAnalysis():
             filename = img['file_name'].split('.')[0]
             self.gt_paths.append(os.path.join(self.dataDir, "fixation_maps", filename + ".png"))
             self.sal_paths.append(os.path.join(self.dataDir, "predictions", model, img['file_name']))
+            self.fix_paths.append(os.path.join(self.dataDir, "fixations", filename + ".mat"))
 
     def run_context_analysis(self, skip_auc=False):
         """
@@ -116,8 +141,10 @@ class ContextAnalysis():
         sim = np.full(num_files, np.nan)
         ig = np.full(num_files, np.nan)
         auc = np.full(num_files, np.nan)
+        
+        baseline = center_bias(lambda x, y: gaussian2D(x, y, 50), (480, 640))
 
-        for gt, sal, i in zip(self.gt_paths, self.sal_paths, np.arange(num_files)):
+        for gt, sal, fix, i in tqdm(zip(self.gt_paths, self.sal_paths, self.fix_paths, np.arange(num_files))):
             try:
                 sal_map = mpimg.imread(sal)
             except FileNotFoundError:
@@ -125,6 +152,7 @@ class ContextAnalysis():
                 continue
             except OSError:
                 print("File could not be read. Please make sure to indicate an image file.")
+                continue
 
             try:
                 gt_map = mpimg.imread(gt)
@@ -133,6 +161,13 @@ class ContextAnalysis():
                 continue
             except OSError:
                 print("File could not be read. Please make sure to indicate an image file.")
+                continue
+                
+            try:
+                fix_map = create_binary_fixation(fix)
+            except FileNotFoundError:
+                print("Fixation Matfile at path {} could not be found.".format(fix))
+                continue
 
             # convert rgb to grayscale if necessary
             if np.size(np.shape(sal_map)) == 3:
@@ -140,6 +175,6 @@ class ContextAnalysis():
             if np.size(np.shape(gt_map)) == 3:
                 gt_map = np.mean(gt_map, axis=2)
 
-            nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, gt_map, skip_auc=skip_auc)
+            nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, metrics=self.metrics, fix_map=gt_map, fix_binary=fix_map, baseline=baseline)
 
         return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)

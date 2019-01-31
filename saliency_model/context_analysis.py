@@ -89,6 +89,18 @@ class ContextAnalysis():
         """
         if context == 'none':
             imgIds = self.coco.getImgIds()
+        if context == 'no person':
+
+            # all image Ids
+            all_img_ids = set(self.coco.getImgIds())
+
+            # get all categories associated with persons
+            cat_ids = self.coco.getCatIds(catNms=context)
+            person_img_ids = set(self.coco.getImgIds(catIds=cat_ids))
+
+            # take the difference of both datasets
+            imgIds = list(all_img_ids.difference(person_img_ids))
+
         else:
             # get all categories associated with context
             ids = self.coco.getCatIds(supNms=context)

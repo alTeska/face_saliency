@@ -9,6 +9,11 @@ from metrics import compute_all_metrics, center_bias, gaussian2D
 
 
 def get_dataset_ids(path):
+    """
+    finds all the image IDS, i.e. filenames, that are existent in the given path
+    :param path: directory of the image files
+    :return: list of image IDs
+    """
     filenames = os.listdir(path)
 
     ds_ids = []
@@ -19,6 +24,11 @@ def get_dataset_ids(path):
 
 
 def create_binary_fixation(path):
+    """
+    Creates a binary fixation map out of SALICON matfiles, providing the fixation points and the resolution of the image.
+    :param path: directory containing matfiles
+    :return: binary fixation map
+    """
     fix = sio.loadmat(path)
     
     fix_gaze = fix['gaze'][0][0][0]
@@ -40,12 +50,13 @@ class ContextAnalysis():
 
     def __init__(self, dataDir, models, contexts, metrics, coco=None):
         """
-        TODO
-        :param dataDir:
-        :param models:
-        :param contexts:
-        :param metrics:
-        :param coco:
+        initializes an instance of the ContextAnalysis class.
+        :param dataDir: directory with the images, predictions and ground truth files in respective folders
+        :param models: string array with models to score
+        :param contexts: string array with contexts to score models on
+        :param metrics: string array with scoring metrics to use
+        :param coco (optional): instance of a COCO object from the pycocotools toolbox. If empty, a new COCO object will
+        be created using the validation set from 2014.
         """
         self.dataDir = dataDir
         self.models = models
@@ -60,8 +71,8 @@ class ContextAnalysis():
 
     def instantiate_coco(self):
         """
-        TODO
-        :return:
+        Instantiates a COCO object (from the pycocotools toolbox) from the SALICON / COOO validation set from 2014
+        :return: COCO object
         """
         dataType = 'val2014'
         annFile = '{}\\annotations\\instances_{}.json'.format(self.dataDir, dataType)
@@ -72,10 +83,9 @@ class ContextAnalysis():
 
     def store_context_saliencymaps(self, context, model):
         """
-        TODO
-        :param context:
-        :param model:
-        :return:
+        Filters the given paths from the object directory by context and stores them in the ContextAnalysis object.
+        :param context: String specifying COCO category
+        :param model: String specifying model folder to look into
         """
         if context == 'none':
             imgIds = self.coco.getImgIds()
@@ -109,7 +119,7 @@ class ContextAnalysis():
             self.sal_paths.append(os.path.join(self.dataDir, "predictions", model, img['file_name']))
             self.fix_paths.append(os.path.join(self.dataDir, "fixations", filename + ".mat"))
 
-    def run_context_analysis(self, skip_auc=False):
+    def run_context_analysis(self):
         """
         Computes the metrics for each combination of contexts and models.
         :param skip_auc: Parameter to skip the computationally exhausting AUC metric
@@ -126,13 +136,12 @@ class ContextAnalysis():
                 self.store_context_saliencymaps(self.contexts[i], self.models[j])
                 summary[i][j] = self.run_dataset_analysis()
 
-        return summary
+        return summary, ['nss', 'sim', 'ig', 'auc']
 
     def run_dataset_analysis(self):
         """
-        TODO
-        :param skip_auc:
-        :return:
+        Takes the context and model specific image paths and computes all specified metrics on them.
+        :return: mean of the metrics over all images, order: NSS, SIM, IG, AUC
         """
 
         num_files = np.size(self.gt_paths)

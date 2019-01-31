@@ -1,19 +1,20 @@
 import numpy as np
-import os
 from skimage.transform import resize
 
 from utils import gaussian2D, center_bias
 
 
-
-
-
-def compute_all_metrics(sal_map, metrics, fix_map = [], fix_binary = [], baseline = []):
-    '''
+def compute_all_metrics(sal_map, metrics, fix_map=[], fix_binary=[], baseline=[]):
+    """
     Computes the score-value for all metrics. Only scores computed, for additional information,
     run the single function.
-    Output: NSS, SIM, IG, AUC
-    '''
+    :param sal_map: 2D array containing predicted saliency map
+    :param metrics: String array with metrics to be computed
+    :param fix_map: 2D array containing groundtruth fixation distribution
+    :param fix_binary: 2D array containing groundtruth binary fixation
+    :param baseline: 2D array containing baseline saliency map
+    :return: NSS, SIM, IG, AUC
+    """
     
     fix_binary = fix_binary if list(fix_binary) else fix_map > 0
     fix_map = fix_map if list(fix_map) else fix_binary
@@ -45,9 +46,12 @@ def compute_all_metrics(sal_map, metrics, fix_map = [], fix_binary = [], baselin
 
 
 def auc_judd_score(sal_map, fix_map):
-    '''
-    Computes the AUC of the saliency map and the fixation map according to Judd et al. 
-    '''
+    """
+    Computes the AUC of the saliency map and the fixation map according to Judd et al.
+    :param sal_map: 2D array containing saliency prediction
+    :param fix_map: 2D array containing saliency ground-truth
+    :return: AUC score, true positives, false positives and thresholds
+    """
     
     # scale both images to the size of fixation map
     sal_map, fix_map = adjust_image_size(sal_map, fix_map)
@@ -68,10 +72,21 @@ def auc_judd_score(sal_map, fix_map):
     return score, tp, fp, thresholds
 
 
-def adjust_image_size(img1, img2, downscale_only = False):
+def adjust_image_size(img1, img2, downscale_only=False):
+    """
+    Checks if the images have the same size. If not, it rescales the first image to the size of the second image. If
+    downscale_only is set to true, the bigger one is scaled to the size of the smaller image, regardless of the ordering.
+
+    NOTE: This is not supposed to be done for scaling fixation binary maps and saliency maps, since information can be
+    lost by downscaling binary maps!
+
+    :param img1: 2D array containing first image (i.e. saliency prediction map)
+    :param img2: 2D array containing second image (i.e. fixation map / binary)
+    :param downscale_only: Boolean
+    :return: scaled images: img1, img2
+    """
     '''
-    Checks if the images have the same size. If not, it rescales the first image to the size of the second image. 
-    If downscale_only is set to true, the bigger one is scaled to the size of the smaller image, regardless of the ordering.
+    
     '''
     # make the images the same size
     if downscale_only:
@@ -91,9 +106,13 @@ def adjust_image_size(img1, img2, downscale_only = False):
 
 
 def compute_tp_fp(sorted_thr, sal_map):
-    '''
-    Computes the true and false positives corresponding to the sorted thresholds for the ground truth fixations and the given saliency map.
-    '''
+    """
+    Computes the true and false positives corresponding to the sorted thresholds for the ground truth fixations
+    and the given saliency map.
+    :param sorted_thr: array with the sorted thresholds from the saliency map
+    :param sal_map: 2D saliency prediction map
+    :return: two arrays with true positives and false positives
+    """
     
     # amount of pixels in total and amount of true fixations
     n_pixels = np.size(sal_map)
@@ -124,6 +143,12 @@ def compute_tp_fp(sorted_thr, sal_map):
 
 
 def compute_nss(sal_map, fix_binary):
+    """
+    Computes the Normalized Scanpath Saliency (NSS) for a binary fixation and a saliency prediction map.
+    :param sal_map: 2D array containing saliency prediction
+    :param fix_binary: 2D array containing binary fixation values
+    :return: NSS score
+    """
     
     # adjust the image size if it hasn't been done before
     sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
@@ -141,6 +166,12 @@ def compute_nss(sal_map, fix_binary):
 
 
 def compute_similarity(sal_map, fix_map):
+    """
+    Computer the Similiarity Score (SIM) for a saliency prediction map and a ground truth fixation distribution map.
+    :param sal_map: 2D array containing saliency prediction
+    :param fix_map: 2D array containing fixation distribution (ground truth)
+    :return: SIM score
+    """
    
     # adjust the image size if it hasn't been done before
     sal_map, fix_map = adjust_image_size(sal_map, fix_map)
@@ -153,11 +184,15 @@ def compute_similarity(sal_map, fix_map):
     return np.sum(np.minimum(fix_norm, sal_norm))
 
 
-def compute_information_gain(sal_map, fix_binary, baseline = []):
-    '''
-    Computes the information gain of the saliency map over the baseline. If no baseline is provided,
+def compute_information_gain(sal_map, fix_binary, baseline=[]):
+    """
+    Computes the information gain (IG) of the saliency map over the baseline. If no baseline is provided,
     the information gain over the center bias is computed.
-    '''
+    :param sal_map: 2D array containing predicted saliency map
+    :param fix_binary: 2D array containing groundtruth binary fixations
+    :param baseline (optional): 2D array containing baseline saliency
+    :return: IG score
+    """
     # adjust image size if it hasn't happened before
     sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
     

@@ -1,8 +1,8 @@
 # Basic features implemented by the Itti-Koch Algorithm
 import skimage
 import numpy as np
-import face_recognition
-from .utils import convolve_kernels, fit_gauss_to_rectangle
+#import face_recognition
+from utils import convolve_kernels, fit_gauss_to_rectangle
 
 
 def compute_intensity(img_list):

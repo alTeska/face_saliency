@@ -87,9 +87,10 @@ class ContextAnalysis():
         :param context: String specifying COCO category
         :param model: String specifying model folder to look into
         """
-        if context == 'none':
+        if context == 'all':
             imgIds = self.coco.getImgIds()
-        if context == 'no person':
+
+        elif context == 'no person':
 
             # all image Ids
             all_img_ids = set(self.coco.getImgIds())

@@ -39,19 +39,32 @@ path = 'data/face/results/'
 fnames = glob('data/face/*.jpg')
 
 # take care of directories
-# directories_inp = ['IK', 'aim', 'sun', 'cas', 'covsal', 'gbvs','icf']
-# directories_out = ['IK_face', 'aim_face', 'sun_face', 'cas_face','covsal_face', 'gbvs_face', 'icf_face']
-directories_inp = ['ik']
-directories_out = ['ik_face']
+directories_inp = ['ik', 'aim', 'sun', 'cas', 'covsal', 'gbvs','icf']
+directories_out = ['ik_face', 'aim_face', 'sun_face', 'cas_face','covsal_face', 'gbvs_face', 'icf_face']
+# directories_inp = ['ik']
+# directories_out = ['ik_face']
 
+
+if not os.path.exists(path_inp+'done/'):
+    os.makedirs(path_inp+'done/')
 
 if not os.path.exists(path):
-    os.makedirs(path)
+        os.makedirs(path)
 
 for direct in directories_out:
-    if not os.path.exists(path+direct):
+    if not os.path.exists(path +'face_03/'+direct):
         print('creating directory ' + direct)
-        os.makedirs(path+direct)
+        os.makedirs(path +'face_03/'+direct)
+
+for direct in directories_out:
+    if not os.path.exists(path+'face_05/'+direct):
+        print('creating directory ' + direct)
+        os.makedirs(path+'face_05/'+direct)
+
+for direct in directories_out:
+    if not os.path.exists(path+'face_07/'+direct):
+        print('creating directory ' + direct)
+        os.makedirs(path+'face_07/'+direct)
 
 
 for fname in tqdm(fnames):
@@ -64,17 +77,25 @@ for fname in tqdm(fnames):
 
         smap = mpimg.imread(fname_inp)
 
+        # normalize saliecies
         smap = normalize_saliency_map(smap)
         smap_face = normalize_saliency_map(smap_face)
-        smap_final = normalize_saliency_map(smap/2 + smap_face/2)
 
-        # # normalize saliecies
-        # fig, ax = plt.subplots(1,3, figsize=(10,10))
+        smap_final_03 = normalize_saliency_map(smap * 0.7 + smap_face * 0.3)
+        smap_final_05 = normalize_saliency_map(smap * 0.5 + smap_face * 0.5)
+        smap_final_07 = normalize_saliency_map(smap * 0.3 + smap_face * 0.7)
+
+        # fig, ax = plt.subplots(1,5, figsize=(10,10))
         #
         # ax[0].imshow(smap)
         # ax[1].imshow(smap_face)
-        # ax[2].imshow(smap_final)
+        # ax[2].imshow(smap_final_03)
+        # ax[3].imshow(smap_final_05)
+        # ax[4].imshow(smap_final_07)
         # plt.show()
-        save_plot_without_frames(smap_final, fname_out)
+
+        save_plot_without_frames(smap_final_03, path + 'face_03/' + direct + '_face/' + name)
+        save_plot_without_frames(smap_final_05, path + 'face_05/' + direct + '_face/' + name)
+        save_plot_without_frames(smap_final_07, path + 'face_07/' + direct + '_face/' + name)
 
     shutil.move(fname, 'data/face/done/')

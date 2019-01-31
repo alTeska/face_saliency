@@ -203,3 +203,5 @@ def compute_conspicuity_map(convolution_maps, mapsize, resize_map = True):
     conspicuity_map = normalize(conspicuity_map)
 
     return conspicuity_map
+
+

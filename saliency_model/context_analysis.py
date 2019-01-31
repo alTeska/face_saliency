@@ -97,7 +97,11 @@ class ContextAnalysis():
 
         # get images corresponding to ids
         images = self.coco.loadImgs(final_ids)
-
+        print("Found {} images in this context.".format(len(images)))
+        
+        self.gt_paths = []
+        self.sal_paths = []
+        self.fix_paths = []
         # get corresponding paths (in pairs?)
         for img in images:
             filename = img['file_name'].split('.')[0]
@@ -120,14 +124,11 @@ class ContextAnalysis():
             for j in np.arange(num_mod):
                 print("Computing metrics for the {} model in the {} context".format(self.models[j], self.contexts[i]))
                 self.store_context_saliencymaps(self.contexts[i], self.models[j])
-                summary[i][j] = self.run_dataset_analysis(skip_auc)
-
-                with open('filename.txt', mode='wt', encoding='utf-8') as myfile:
-                    myfile.write('\n'.join(str(summary[i][j])))
+                summary[i][j] = self.run_dataset_analysis()
 
         return summary
 
-    def run_dataset_analysis(self, skip_auc):
+    def run_dataset_analysis(self):
         """
         TODO
         :param skip_auc:

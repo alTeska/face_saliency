@@ -11,11 +11,12 @@ path = './imgs/baby1.png'
 img = mpimg.imread(path)
 
 params_ik = {
-    "mapwidth": 64
+    "mapwidth": 64,
+    "face_model":'cnn',
 }
 
 features = ["intensity", "orientation", "color"]
-IK = IttiKoch(verbose=True)
+IK = IttiKoch(input_params=params_ik, verbose=True)
 saliency, maps = IK.run(img, features, faces=True)
 
 fig, ax = plt.subplots(2, 3, figsize=(15, 5))

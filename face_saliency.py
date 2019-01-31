@@ -30,21 +30,20 @@ def apply_face_saliency(image, face_locations, blur=2):
 
 
 image = face_recognition.load_image_file("imgs/group.jpg")
-print(np.shape(image))
-print(type(image))
-print(image.dtype)
 # image = face_recognition.load_image_file("imgs/biden.jpg")
-image = face_recognition.load_image_file("imgs/baby1.png")
-print(np.shape(image))
-print(type(image))
-print(image.dtype)
+# image = face_recognition.load_image_file("imgs/baby1.png")
 # image = face_recognition.load_image_file("imgs/1.jpg")
 
+
+
+face_locations_cnn = face_recognition.face_locations(image, model="cnn")
 face_locations = face_recognition.face_locations(image)
 saliency = apply_face_saliency(image, face_locations)
+saliency_cnn = apply_face_saliency(image, face_locations)
 
-fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10, 10))
+fig, ax = plt.subplots(ncols=3, nrows=1, figsize=(10, 10))
 ax[0].imshow(image);
 ax[1].imshow(saliency, cmap='gray', vmin=0, vmax=1);
+ax[2].imshow(saliency_cnn, cmap='gray', vmin=0, vmax=1);
 
 plt.show()

@@ -2,7 +2,6 @@ import math
 import warnings
 import numpy as np
 import scipy.signal as signal
-import matplotlib.pyplot as plt
 import skimage.transform as transform
 
 from skimage.feature import peak_local_max
@@ -43,8 +42,9 @@ def center_bias(func, mapsize):
             g[xi, yi] = func(x, y)
     # normalize to a height of one
     g = g / np.max(g)
+
     return g
-    
+
 
 def fit_gauss_to_rectangle(top, bottom, right, left):
     '''

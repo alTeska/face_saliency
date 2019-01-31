@@ -1,10 +1,9 @@
 # development file, later on itti&koch class
-import math
 import numpy as np
-import scipy.signal as signal
 from scipy import ndimage as nd
 import matplotlib.image as mpimg
 from skimage import img_as_float64
+from skimage.transform import resize
 
 from utils import *
 from itti_koch_features import *
@@ -32,7 +31,8 @@ class IttiKoch():
             "gabor_frequency": 0.1,
             "gabor_phase": False,
             "gaussian_blur": 2,
-            "fraction_centerbias": 2
+            "fraction_centerbias": 2,
+            'face_model': None,
         }
 
 
@@ -86,7 +86,8 @@ class IttiKoch():
         '''
         Given an image returns its saliency and the single saliency maps in the order of feature  input
         '''
-        # img = img_as_float64(img) # convert to doubles if image is uint8
+        # save image size
+        img_size = np.shape(img)
 
         # compute spatial scales
         if self.verbose:
@@ -114,21 +115,21 @@ class IttiKoch():
 
             # compute conspicuity map
             if (key == "orientation"):
-                saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels))
+                m = self.make_conspicuity_maps(img_scales, curr_func, gabor_kernels)
+                saliency_maps.append(resize(m, img_size[0:2], mode='constant', anti_aliasing=True))
             else:
-                saliency_maps.append(self.make_conspicuity_maps(img_scales, curr_func))
+                m = self.make_conspicuity_maps(img_scales, curr_func)
+                saliency_maps.append(resize(m, img_size[0:2], mode='constant', anti_aliasing=True))
 
+        # add faces detection into the model
+        if faces:
+            face_sal = compute_faces(img, self.params['face_model'])
+            saliency_maps.append(np.squeeze(face_sal))
 
         # sum & normalize across channels
         wj = self.params["topdown_weights"]
 
-        # add faces detection into the model
-        if faces:
-            faces_saliency = compute_faces(img)
-            face_sal = downsample_image(faces_saliency, self.params["mapsize"][0], self.params["min_mapwidth"], [1])
-            saliency_maps.append(np.squeeze(face_sal))
-
-        saliency = np.zeros(self.params["mapsize"])
+        saliency = np.zeros(img_size[0:2])
         for i in np.arange(len(saliency_maps)):
             saliency = saliency + wj[i]*saliency_maps[i]
 
@@ -136,7 +137,8 @@ class IttiKoch():
         saliency = nd.gaussian_filter(saliency, self.params["gaussian_blur"])
 
         # normalize with the maximum of the map
-        saliency = saliency / np.max(saliency)
+        if not (np.max(saliency) == 0):  # don't normalize if saliency map is empty
+            saliency = saliency / np.max(saliency)
 
         # introduce center bias
         saliency = saliency * center_bias(lambda x, y: gaussian2D(x, y, min(np.shape(saliency)) / self.params["fraction_centerbias"]), np.shape(saliency))

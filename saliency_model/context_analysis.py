@@ -48,7 +48,7 @@ def create_binary_fixation(path):
 
 class ContextAnalysis():
 
-    def __init__(self, dataDir, models, contexts, metrics, coco=None):
+    def __init__(self, dataDir, coco=None):
         """
         initializes an instance of the ContextAnalysis class.
         :param dataDir: directory with the images, predictions and ground truth files in respective folders
@@ -59,15 +59,17 @@ class ContextAnalysis():
         be created using the validation set from 2014.
         """
         self.dataDir = dataDir
-        self.models = models
-        self.contexts = contexts
-        self.metrics = metrics
+        self.models = []
+        self.contexts = []
+        self.metrics = []
+        self.baselines = []
         self.coco = coco if coco else self.instantiate_coco()
 
         # datapaths for ground truth and saliency predictions
         self.gt_paths = []
         self.sal_paths = []
         self.fix_paths = []
+        self.base_paths = []
 
     def instantiate_coco(self):
         """
@@ -81,7 +83,35 @@ class ContextAnalysis():
         coco = COCO(annFile)
         return coco
 
-    def store_context_saliencymaps(self, context, model):
+    def run_context_analysis(self, models, contexts, metrics, baseline_models):
+        """
+        Computes the metrics for each combination of contexts and models.
+        :param models:
+        :param contexts:
+        :param metrics:
+        :param baseline_models: array of strings containing corresponding baseline models
+        :return:
+        """
+
+        # self.models = models
+        # self.contexts = contexts
+        # self.metrics = metrics
+        # self.baselines = baseline_models
+
+        num_cxt = np.size(contexts)
+        num_mod = np.size(models)
+        summary = np.zeros((num_cxt, num_mod, 4))
+
+        assert np.size(baseline_models) == np.size(models)
+
+        for i in np.arange(num_cxt):
+            for j in np.arange(num_mod):
+                self.store_context_saliencymaps(contexts[i], models[j], baseline_models[j])
+                summary[i][j] = self.run_dataset_analysis(metrics, baseline_models[j])
+
+        return summary, ['nss', 'sim', 'ig', 'auc']
+
+    def store_context_saliencymaps(self, context, model, baseline):
         """
         Filters the given paths from the object directory by context and stores them in the ContextAnalysis object.
         :param context: String specifying COCO category
@@ -120,37 +150,24 @@ class ContextAnalysis():
 
         # get images corresponding to ids
         images = self.coco.loadImgs(final_ids)
-        print("Context: {}, Model: {}, Images found: {}".format(context, model, len(images)))
+        print("Context: {}, Model: {}, Baseline: {}, Images found: {}".format(context, model, baseline, len(images)))
         
         self.gt_paths = []
         self.sal_paths = []
         self.fix_paths = []
-        # get corresponding paths (in pairs?)
+        self.base_paths = []
+
+        # get corresponding paths
         for img in images:
             filename = img['file_name'].split('.')[0]
             self.gt_paths.append(os.path.join(self.dataDir, "fixation_maps", filename + ".png"))
             self.sal_paths.append(os.path.join(self.dataDir, "predictions", model, img['file_name']))
             self.fix_paths.append(os.path.join(self.dataDir, "fixations", filename + ".mat"))
 
-    def run_context_analysis(self):
-        """
-        Computes the metrics for each combination of contexts and models.
-        :param skip_auc: Parameter to skip the computationally exhausting AUC metric
-        :return: array of the form (number of contexts) X (number of models) X (number of metrics) with values stored
-        in the same order as passed for initialisation
-        """
-        num_cxt = np.size(self.contexts)
-        num_mod = np.size(self.models)
-        summary = np.zeros((num_cxt, num_mod, 4))
+            if baseline != 'center':
+                self.base_paths.append(os.path.join(self.dataDir, "predictions", baseline, img['file_name']))
 
-        for i in np.arange(num_cxt):
-            for j in np.arange(num_mod):
-                self.store_context_saliencymaps(self.contexts[i], self.models[j])
-                summary[i][j] = self.run_dataset_analysis()
-
-        return summary, ['nss', 'sim', 'ig', 'auc']
-
-    def run_dataset_analysis(self):
+    def run_dataset_analysis(self, metrics, baseline):
         """
         Takes the context and model specific image paths and computes all specified metrics on them.
         :return: mean of the metrics over all images, order: NSS, SIM, IG, AUC
@@ -163,10 +180,21 @@ class ContextAnalysis():
         sim = np.full(num_files, np.nan)
         ig = np.full(num_files, np.nan)
         auc = np.full(num_files, np.nan)
-        
-        baseline = center_bias(lambda x, y: gaussian2D(x, y, 50), (480, 640))
 
         for gt, sal, fix, i in tqdm(zip(self.gt_paths, self.sal_paths, self.fix_paths, np.arange(num_files))):
+
+            if baseline == 'center':
+                base_model = center_bias(lambda x, y: gaussian2D(x, y, 50), (480, 640))
+            else:
+                try:
+                    base_model = mpimg.imread(self.base_paths[i])
+                except FileNotFoundError:
+                    print("Baseline image at path {} could not be found.".format(sal))
+                    continue
+                except OSError:
+                    print("File could not be read. Please make sure to indicate an image file.")
+                    continue
+
             try:
                 sal_map = mpimg.imread(sal)
             except FileNotFoundError:
@@ -196,14 +224,22 @@ class ContextAnalysis():
                 sal_map = np.mean(sal_map, axis=2)
             if np.size(np.shape(gt_map)) == 3:
                 gt_map = np.mean(gt_map, axis=2)
+            if np.size(np.shape(base_model)) == 3:
+                base_model = np.mean(base_model, axis=2)
 
             try:
-                assert(np.size(np.shape(sal_map))==2 and np.size(np.shape(gt_map))==2)
+                assert(np.size(np.shape(sal_map)) == 2 and np.size(np.shape(gt_map)) == 2
+                        and np.size(np.shape(base_model)) == 2)
             except AssertionError:
-                print("Saliency map at path {} has shape {} and groundtruth map at path {} has shape {}."
-                      .format(sal, np.shape(sal_map), fix, np.shape(fix_map)))
+                print("Saliency map at path {} has shape {}, groundtruth map at path {} has shape {}, baseline at path"
+                      "{} has shape {}."
+                      .format(sal, np.shape(sal_map), fix, np.shape(fix_map), self.base_paths[i], np.shape(base_model)))
                 continue
 
-            nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, metrics=self.metrics, fix_map=gt_map, fix_binary=fix_map, baseline=baseline)
+            nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map,
+                                                                metrics=metrics,
+                                                                fix_map=gt_map,
+                                                                fix_binary=fix_map,
+                                                                baseline=base_model)
 
         return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)

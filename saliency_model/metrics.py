@@ -195,7 +195,9 @@ def compute_information_gain(sal_map, fix_binary, baseline=[]):
     """
     # adjust image size if it hasn't happened before
     sal_map, fix_binary = adjust_image_size(sal_map, fix_binary)
-    
+    if list(baseline):
+        baseline, fix_binary = adjust_image_size(baseline, fix_binary)
+
     # create center bias baseline if no baseline provided
     baseline = baseline if list(baseline) else center_bias(lambda x, y: gaussian2D(x, y, 50), np.shape(fix_binary))
     

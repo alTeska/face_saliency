@@ -120,7 +120,7 @@ class ContextAnalysis():
 
         # get images corresponding to ids
         images = self.coco.loadImgs(final_ids)
-        print("Found {} images in this context.".format(len(images)))
+        print("Context: {}, Model: {}, Images found: {}".format(context, model, len(images)))
         
         self.gt_paths = []
         self.sal_paths = []
@@ -145,7 +145,6 @@ class ContextAnalysis():
 
         for i in np.arange(num_cxt):
             for j in np.arange(num_mod):
-                print("Computing metrics for the {} model in the {} context".format(self.models[j], self.contexts[i]))
                 self.store_context_saliencymaps(self.contexts[i], self.models[j])
                 summary[i][j] = self.run_dataset_analysis()
 
@@ -197,6 +196,13 @@ class ContextAnalysis():
                 sal_map = np.mean(sal_map, axis=2)
             if np.size(np.shape(gt_map)) == 3:
                 gt_map = np.mean(gt_map, axis=2)
+
+            try:
+                assert(np.size(np.shape(sal_map))==2 and np.size(np.shape(gt_map))==2)
+            except AssertionError:
+                print("Saliency map at path {} has shape {} and groundtruth map at path {} has shape {}."
+                      .format(sal, np.shape(sal_map), fix, np.shape(fix_map)))
+                continue
 
             nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map, metrics=self.metrics, fix_map=gt_map, fix_binary=fix_map, baseline=baseline)
 

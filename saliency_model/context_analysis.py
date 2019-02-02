@@ -83,7 +83,7 @@ class ContextAnalysis():
         coco = COCO(annFile)
         return coco
 
-    def run_context_analysis(self, models, contexts, metrics, baseline_models):
+    def run_context_analysis(self, models, contexts, metrics, baseline_models, return_all=False, numPictures=None):
         """
         Computes the metrics for each combination of contexts and models.
         :param models:
@@ -93,21 +93,23 @@ class ContextAnalysis():
         :return:
         """
 
-        # self.models = models
-        # self.contexts = contexts
-        # self.metrics = metrics
-        # self.baselines = baseline_models
-
         num_cxt = np.size(contexts)
         num_mod = np.size(models)
-        summary = np.zeros((num_cxt, num_mod, 4))
+
+        if return_all:
+            summary = np.zeros((num_mod, 4, numPictures))
+        else:
+            summary = np.zeros((num_cxt, num_mod, 4))
 
         assert np.size(baseline_models) == np.size(models)
 
         for i in np.arange(num_cxt):
             for j in np.arange(num_mod):
                 self.store_context_saliencymaps(contexts[i], models[j], baseline_models[j])
-                summary[i][j] = self.run_dataset_analysis(metrics, baseline_models[j])
+                if return_all:
+                    summary[j] = self.run_dataset_analysis(metrics, baseline_models[j], return_all)
+                else:
+                    summary[i][j] = self.run_dataset_analysis(metrics, baseline_models[j], return_all)
 
         return summary, ['nss', 'sim', 'ig', 'auc']
 
@@ -167,7 +169,7 @@ class ContextAnalysis():
             if baseline != 'center':
                 self.base_paths.append(os.path.join(self.dataDir, "predictions", baseline, img['file_name']))
 
-    def run_dataset_analysis(self, metrics, baseline):
+    def run_dataset_analysis(self, metrics, baseline, return_all):
         """
         Takes the context and model specific image paths and computes all specified metrics on them.
         :return: mean of the metrics over all images, order: NSS, SIM, IG, AUC
@@ -183,7 +185,9 @@ class ContextAnalysis():
 
         for gt, sal, fix, i in tqdm(zip(self.gt_paths, self.sal_paths, self.fix_paths, np.arange(num_files))):
 
-            if baseline == 'center':
+            if baseline == 'none':
+                base_model = []
+            elif baseline == 'center':
                 base_model = center_bias(lambda x, y: gaussian2D(x, y, 50), (480, 640))
             else:
                 try:
@@ -227,19 +231,22 @@ class ContextAnalysis():
             if np.size(np.shape(base_model)) == 3:
                 base_model = np.mean(base_model, axis=2)
 
-            try:
-                assert(np.size(np.shape(sal_map)) == 2 and np.size(np.shape(gt_map)) == 2
-                        and np.size(np.shape(base_model)) == 2)
-            except AssertionError:
-                print("Saliency map at path {} has shape {}, groundtruth map at path {} has shape {}, baseline at path"
-                      "{} has shape {}."
-                      .format(sal, np.shape(sal_map), fix, np.shape(fix_map), self.base_paths[i], np.shape(base_model)))
-                continue
+            if not baseline == 'none':
+                try:
+                    assert(np.size(np.shape(sal_map)) == 2 and np.size(np.shape(gt_map)) == 2
+                            and np.size(np.shape(base_model)) == 2)
+                except AssertionError:
+                    print("Saliency map at path {} has shape {}, groundtruth map at path {} has shape {}, baseline at path"
+                          "{} has shape {}."
+                          .format(sal, np.shape(sal_map), fix, np.shape(fix_map), self.base_paths[i], np.shape(base_model)))
+                    continue
 
             nss[i], sim[i], ig[i], auc[i] = compute_all_metrics(sal_map,
                                                                 metrics=metrics,
                                                                 fix_map=gt_map,
                                                                 fix_binary=fix_map,
                                                                 baseline=base_model)
-
-        return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)
+        if return_all:
+            return nss, sim, ig, auc
+        else:
+            return np.nanmean(nss), np.nanmean(sim), np.nanmean(ig), np.nanmean(auc)

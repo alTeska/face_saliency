@@ -4,7 +4,7 @@ from skimage.transform import resize
 from utils import gaussian2D, center_bias
 
 
-def compute_all_metrics(sal_map, metrics, fix_map=[], fix_binary=[], baseline=[]):
+def compute_all_metrics(sal_map, metrics, fix_map=[], fix_binary=[], baseline=[], return_all=False):
     """
     Computes the score-value for all metrics. Only scores computed, for additional information,
     run the single function.
@@ -23,7 +23,7 @@ def compute_all_metrics(sal_map, metrics, fix_map=[], fix_binary=[], baseline=[]
     sal_map, fix_map = adjust_image_size(sal_map, fix_map)
     
     if 'auc' in metrics:
-        auc_score, temp, temp, temp = auc_judd_score(sal_map, fix_binary)
+        auc_score, temp, temp, temp = auc_judd_score(sal_map, fix_binary, return_all)
     else:
         auc_score = 0
         
@@ -45,7 +45,7 @@ def compute_all_metrics(sal_map, metrics, fix_map=[], fix_binary=[], baseline=[]
     return nss, sim_score, info_gain, auc_score
 
 
-def auc_judd_score(sal_map, fix_map):
+def auc_judd_score(sal_map, fix_map, return_all):
     """
     Computes the AUC of the saliency map and the fixation map according to Judd et al.
     :param sal_map: 2D array containing saliency prediction

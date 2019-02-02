@@ -5,8 +5,8 @@ import matplotlib.image as mpimg
 from skimage import img_as_float64
 from skimage.transform import resize
 
-from utils import *
-from itti_koch_features import *
+from .utils import *
+from .itti_koch_features import *
 
 
 class IttiKoch():

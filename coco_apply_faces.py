@@ -34,15 +34,15 @@ def normalize_saliency_map(smap):
     return smap
 
 
-path_inp = 'data/face/'
-path = 'data/face/results/'
-fnames = glob('data/face/*.jpg')
+path_inp = 'data/redo/'
+path = 'data/redo/results/'
+fnames = glob('data/redo/*.jpg')
 
 # take care of directories
-directories_inp = ['ik', 'aim', 'sun', 'cas', 'covsal', 'gbvs','icf']
-directories_out = ['ik_face', 'aim_face', 'sun_face', 'cas_face','covsal_face', 'gbvs_face', 'icf_face']
-# directories_inp = ['ik']
-# directories_out = ['ik_face']
+# directories_inp = ['ik', 'aim', 'sun', 'cas', 'covsal', 'gbvs','icf']
+# directories_out = ['ik_face', 'aim_face', 'sun_face', 'cas_face','covsal_face', 'gbvs_face', 'icf_face']
+directories_inp = ['ik']
+directories_out = ['ik_face']
 
 
 if not os.path.exists(path_inp+'done/'):
@@ -76,7 +76,6 @@ for fname in tqdm(fnames):
         fname_out = path + direct + '_face/' + name
 
         smap = mpimg.imread(fname_inp)
-
         # normalize saliecies
         smap = normalize_saliency_map(smap)
         smap_face = normalize_saliency_map(smap_face)
@@ -98,4 +97,4 @@ for fname in tqdm(fnames):
         save_plot_without_frames(smap_final_05, path + 'face_05/' + direct + '_face/' + name)
         save_plot_without_frames(smap_final_07, path + 'face_07/' + direct + '_face/' + name)
 
-    shutil.move(fname, 'data/face/done/')
+    shutil.move(fname, 'data/redo/done/')

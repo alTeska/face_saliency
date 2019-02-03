@@ -41,10 +41,10 @@ def normalize_saliency_map(smap):
     return smap
 
 
-path = 'data/test/results/'
-fnames = glob('data/test/*.jpg')
-
+path = 'data/redo/results/'
+fnames = glob('data/redo/*.jpg')
 # take care of directories
+
 directories = ['IK', 'faces',  'aim', 'sun', 'cas', 'covsal', 'gbvs', 'dg',
 'icf', 'ik_face', 'aim_face', 'sun_face', 'cas_face',
 'covsal_face', 'gbvs_face', 'icf_face']
@@ -140,6 +140,6 @@ for fname in tqdm(fnames):
     save_plot_without_frames(smap_icf_face, path + 'icf_face/' + name + '.jpg')
 
     pbar.update(10)
-    shutil.move(fname, 'data/test/done')
+    shutil.move(fname, 'data/redo/done')
 
     pbar.close()

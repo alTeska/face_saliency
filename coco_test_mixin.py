@@ -11,6 +11,9 @@ from saliency_model.itti_koch import IttiKoch
 from saliency_model.deep_gaze import run_deep_gaze
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+from saliency_model.utils import normalize_saliency_map
+from utils import save_plot_without_frames
+
 import pysaliency
 from pysaliency.utils import MatlabOptions
 
@@ -19,26 +22,26 @@ MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/
 MatlabOptions.octave_names = []
 
 
-def save_plot_without_frames(img, directory):
-    fig, ax = plt.subplots(1,1)
-
-    ax.imshow(img)
-    ax.set_axis_off()
-    ax.axis('off')
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-    fig.savefig(directory, bbox_inches='tight', pad_inches=0, transparent=True);
-
-    plt.close(fig)
-    gc.collect()
-    pass
-
-
-def normalize_saliency_map(smap):
-    if not (np.max(smap) == 0):  # don't normalize if saliency map is empty
-        smap = smap / np.max(smap)
-    return smap
+# def save_plot_without_frames(img, directory):
+#     fig, ax = plt.subplots(1,1)
+#
+#     ax.imshow(img)
+#     ax.set_axis_off()
+#     ax.axis('off')
+#     ax.get_xaxis().set_visible(False)
+#     ax.get_yaxis().set_visible(False)
+#
+#     fig.savefig(directory, bbox_inches='tight', pad_inches=0, transparent=True);
+#
+#     plt.close(fig)
+#     gc.collect()
+#     pass
+#
+#
+# def normalize_saliency_map(smap):
+#     if not (np.max(smap) == 0):  # don't normalize if saliency map is empty
+#         smap = smap / np.max(smap)
+#     return smap
 
 
 path = 'data/redo/results/'

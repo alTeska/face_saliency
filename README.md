@@ -1,30 +1,62 @@
-﻿# NISE_saliency
-## Multiple feature saliency model development and human data verification.
-Testing multiple architectures and features and their influence in human saliency/attention model.
+# Evaluating the influence of the face as a feature on multiple saliency models
 
-Planned architectures:
-1) bottom-up saliency model from Itti & Koch including center surround and multiple scales [1, 2]
-2) convolution-based handcrafted architecture [3]
+Testing multiple architectures and features and how influence they are by face presence in human saliency/attention model. the repository also includes Python implementation of Itti&Koch model and metrics for saliency based on original matlab code.
 
-Planned features:
-1) Information based (AIM) [8]
-2) Graph-based (GBVS) [9]
-3) Saliency with natural statistics (SUN) [10]
-4) Global contrast / salient object extraction (Computer Vision) [14] or [15]
-Skin and color detection (Range detection, Backprojection) [6]
-Saliency map (FASA - Fast, Accurate, and Size-Aware Salient Object Detection) [6]
-5) Face detection (Haar Cascade)[6]
-6) Image Signature (fore vs background) [13, 6]
+#### -- Project Status: [Active]
 
-Additional optional features:
-1) Top-down control with gaze “cone” [ 6]
-2) Boolean Map [11]
-3) Based on log-spectrum [12]
-4) Histogram-based classification (Histogram Intersection) [6]
-5) Motion detection (Frame differencing, MOG, MOG2) [6]
-6) Motion tracking (Particle filter) [6]
+## Project Intro/Objective
+Verification of influence of face presence in attention modeling, including multiple approaches (architectures and features included) to saliency modeling.
 
+### Methods Used:
+* Saliency Maps
+* Face Detection
+* Data Visualization
+
+### Technologies
+* Python
+* Pandas, jupyter
+* tensorflow
+* [pysaliency]https://github.com/matthias-k/pysaliency
+
+## Project Description
+We proposed three hypotheses: That the addition of faces has a positive influence on the performance of traditional models, that this influence is dependent on the context of the picture and that adding faces can make them compete with the recently proposed models based on neural networks. To answer these questions, we evaluated the performance of nine traditional models with and without faces and one model based on a deep neural network for different metrics. The results show a clear benefit for the models when faces are added, although the level of importance we should give to the faces is judged differently across metrics. Moreover, the best performing traditional model complemented with faces can approach the performance of a model based on a deep neural network. From this we conclude, that adding weighted object recognition onto saliency model with hand-crafted features can yield useful insights and should be done also for other salient objects and image regions.
+
+We have implemented a pipeline that allows creation of mixture of features, metrics and faces influence ratio and its evaluation.
+
+### Models Used:
+* Itti&Koch architecture
+* AIM: An information theoretic approach
+* SUN: A Bayesian framework for Saliency Using Natural Statistics
+* CAS: Contrast-Aware Saliency
+* CovSal: Non-linearly integrating features using region covariances
+* GBVS: Graph-Based Visual Saliency
+* DeepGaze II: Reading fixations from deep features trained on object recognition
+* ICF: Intensity Contrast Features
+* Face
+
+### Metrics Used:
+* AUC: Area under the ROC curve
+* NSS: Normalized Scanpath Saliency
+* SIM: Similarity
+* Information Gain (IG)
+
+### Dataset:
+* [COCO](http://cocodataset.org/#download)
+* [Salicon](http://salicon.net/challenge-2017/)
+
+Datasets were merged to extract different context for analysis of the data.
+
+## Needs of this project
+* scaling the approach to full COCO Dataset
+* normalization of the pipeline
+
+## Team:
+* [Annika Thierfelder](https://github.com/athierfelder)
+* [Aleksandra Teska](https://github.com/alTeska)
 
 ## Dependancies:
-pysaliency
-face_recognition
+* [pysaliency](https://github.com/matthias-k/pysaliency)
+* [face_recognition](https://github.com/ageitgey/face_recognition)
+
+## Acknowledgments:
+* [Institute for Cognitive Systems, Technical University Munich](http://www.ics.ei.tum.de/en/home/) - for supervision

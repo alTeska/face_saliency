@@ -6,29 +6,18 @@ from glob import glob
 from tqdm import tqdm
 from saliency_model.itti_koch import IttiKoch
 from saliency_model.deep_gaze import run_deep_gaze
+from utils import save_plot_without_frames
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import pysaliency
 from pysaliency.utils import MatlabOptions
 
+os.chdir('../')
+
 plt.rcParams['image.cmap'] = 'gray'
 MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/bin/matlab']
 MatlabOptions.octave_names = []
-
-
-def save_plot_without_frames(img, directory):
-    fig, ax = plt.subplots(1,1)
-
-    ax.imshow(img)
-    ax.set_axis_off()
-    ax.axis('off')
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-    fig.savefig(directory, bbox_inches='tight', pad_inches=0, transparent=True);
-
-    pass
-
 
 path = 'data/test2/results/'
 fnames = glob('data/test2/*.jpg')
@@ -48,12 +37,15 @@ for direct in directories:
 # initiate our model
 IK = IttiKoch(verbose=False)
 
+location = '../test_models'
+location_cache = 'model_caches'
+
 # initate models from pysaliency
-aim = pysaliency.AIM(location='test_models', cache_location=os.path.join('model_caches', 'AIM'))
-sun = pysaliency.SUN(location='test_models', cache_location=os.path.join('model_caches', 'SUN'))
-cas = pysaliency.ContextAwareSaliency(location='test_models', cache_location=os.path.join('model_caches', 'ContextAwareSaliency'))
-covsal = pysaliency.CovSal(location='test_models', cache_location=os.path.join('model_caches', 'CovSal'))
-gbvs = pysaliency.GBVS(location='test_models', cache_location=os.path.join('model_caches', 'GBVS'))
+aim = pysaliency.AIM(location=location, cache_location=os.path.join(location_cache, 'AIM'))
+sun = pysaliency.SUN(location=location, cache_location=os.path.join(location_cache, 'SUN'))
+cas = pysaliency.ContextAwareSaliency(location=location, cache_location=os.path.join(location_cache, 'ContextAwareSaliency'))
+covsal = pysaliency.CovSal(location=location, cache_location=os.path.join(location_cache, 'CovSal'))
+gbvs = pysaliency.GBVS(location=location, cache_location=os.path.join(location_cache, 'GBVS'))
 
 for fname in tqdm(fnames):
     name = fname[10:-4]  # get just the name of the picture

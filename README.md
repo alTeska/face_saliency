@@ -76,15 +76,15 @@ Saliency maps with different value of the face addition factor.
 
 <figure>
 <p align="center">
-    <img src="/results/sample_saliency/42482_original.jpg" width="220">
-    <img src="/results/sample_saliency/42482_aim.jpg" width="220">
-    <img src="/results/sample_saliency/cas.jpg" width="220">
-    <img src="/results/sample_saliency/covsal.jpg" width="220">
-    <img src="/results/sample_saliency/deepgaze.jpg" width="220">
-    <img src="/results/sample_saliency/gbvs.jpg" width="220">
-    <img src="/results/sample_saliency/icf.jpg" width="220">
-    <img src="/results/sample_saliency/ittikoch.jpg" width="220">
-    <img src="/results/sample_saliency/sun.jpg" width="220">
+    <img src="/results/sample_saliency/42482_original.jpg" width="250">
+    <img src="/results/sample_saliency/42482_aim.jpg" width="250">
+    <img src="/results/sample_saliency/cas.jpg" width="250">
+    <img src="/results/sample_saliency/covsal.jpg" width="250">
+    <img src="/results/sample_saliency/deepgaze.jpg" width="250">
+    <img src="/results/sample_saliency/gbvs.jpg" width="250">
+    <img src="/results/sample_saliency/icf.jpg" width="250">
+    <img src="/results/sample_saliency/ittikoch.jpg" width="250">
+    <img src="/results/sample_saliency/sun.jpg" width="250">
     <!-- <img src="/results/sample_saliency/42482_faces.jpg" width="320"> -->
 </p>
 <figcaption>

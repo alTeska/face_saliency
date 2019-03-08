@@ -7,7 +7,7 @@ import matplotlib.image as mpimg
 from glob import glob
 from tqdm import tqdm
 from saliency_model.utils import normalize_saliency_map
-from utils import save_plot_without_frames
+from utils_analysis import save_plot_without_frames
 
 plt.rcParams['image.cmap'] = 'gray'
 

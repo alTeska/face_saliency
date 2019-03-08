@@ -8,11 +8,16 @@ from tqdm import tqdm
 from saliency_model.itti_koch import IttiKoch
 from saliency_model.deep_gaze import run_deep_gaze
 from saliency_model.utils import normalize_saliency_map
-from utils import save_plot_without_frames
+from utils_analysis import save_plot_without_frames
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import pysaliency
 from pysaliency.utils import MatlabOptions
+
+retval = os.getcwd()
+print("Current working directory %s" % retval)
+
 
 plt.rcParams['image.cmap'] = 'gray'
 MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/bin/matlab']

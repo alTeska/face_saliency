@@ -1,15 +1,13 @@
 import os
-import gc
 import shutil
 import warnings
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from glob import glob
 from tqdm import tqdm
 from saliency_model.itti_koch import IttiKoch
 from saliency_model.utils import normalize_saliency_map
-from utils import save_plot_without_frames
+from utils_analysis import save_plot_without_frames
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import pysaliency
@@ -19,8 +17,8 @@ plt.rcParams['image.cmap'] = 'gray'
 MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/bin/matlab']
 MatlabOptions.octave_names = []
 
-path = 'data/face/results/'
-fnames = glob('data/face/*.jpg')
+path = '../data/test2/results/'
+fnames = glob('../data/test2/*.jpg')
 
 # take care of directories
 directories = ['faces']

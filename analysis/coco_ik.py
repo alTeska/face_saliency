@@ -9,7 +9,8 @@ from glob import glob
 from tqdm import tqdm
 from saliency_model.itti_koch import IttiKoch
 from saliency_model.utils import normalize_saliency_map
-from utils import save_plot_without_frames
+from utils_analysis import save_plot_without_frames
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 plt.rcParams['image.cmap'] = 'gray'
 

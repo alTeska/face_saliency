@@ -7,7 +7,6 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import skimage
-
 import pysaliency
 import pysaliency.external_datasets
 from pysaliency.utils import MatlabOptions
@@ -15,7 +14,6 @@ from saliency_model.itti_koch import IttiKoch
 
 
 plt.rcParams['image.cmap'] = 'gray'
-
 MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/bin/matlab']
 MatlabOptions.octave_names = []
 
@@ -27,7 +25,6 @@ img = skimage.img_as_float(img)
 # initiate our model
 IK = IttiKoch(verbose=False)
 saliency, _ = IK.run(img)
-
 
 # initate models
 aim = pysaliency.AIM(location='test_models', cache_location=os.path.join('model_caches', 'AIM'))

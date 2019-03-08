@@ -63,6 +63,14 @@ All of the statistical results are stored in the following folder:
 ## Acknowledgments:
 * [Institute for Cognitive Systems, Technical University Munich](http://www.ics.ei.tum.de/en/home/) - for supervision
 
+## Sample Mean Scores of the Analysis:
+<figure>
+<p align="center">
+    <img src="report/plots/NSS_sep_with_mean.jpg" width="100%">
+</p>
+<figcaption>
+</figcaption><br><br>
+
 ## Sample saliencies:
 
 <figure>

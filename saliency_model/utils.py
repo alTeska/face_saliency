@@ -143,6 +143,15 @@ def normalize(X):
     return (X - X.min()) / (X.max() - X.min())
 
 
+def normalize_saliency_map(smap):
+    '''
+    normalize saliency map if necessary
+    '''
+    if not (np.max(smap) == 0):  # don't normalize if saliency map is empty
+        smap = smap / np.max(smap)
+    return smap
+
+
 def get_weight_map(peak_avg, peak_num):
     '''
     based on number of peaks and their average return weight of the map used for
@@ -203,5 +212,3 @@ def compute_conspicuity_map(convolution_maps, mapsize, resize_map = True):
     conspicuity_map = normalize(conspicuity_map)
 
     return conspicuity_map
-
-

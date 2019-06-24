@@ -14,8 +14,9 @@ from utils_analysis import save_plot_without_frames
 warnings.simplefilter(action='ignore', category=FutureWarning)
 plt.rcParams['image.cmap'] = 'gray'
 
-path = 'data/redo/results/'
-fnames = glob('data/redo/*.jpg')
+path = '.data/redo/results/'
+fnames = glob('./data/redo/*.jpg')
+print(fnames)
 
 # take care of directories
 directories = ['ik']
@@ -38,7 +39,8 @@ IK = IttiKoch(verbose=False)
 
 
 for fname in tqdm(fnames):
-    name = fname[10:-4]  # get just the name of the picture
+    name = fname[12:-4]  # get just the name of the picture
+    print(name)
     img = mpimg.imread(fname)
 
     # run basic models
@@ -52,4 +54,4 @@ for fname in tqdm(fnames):
     print('Saving plots')
     save_plot_without_frames(smap_ik, path + 'ik/' + name + '.jpg')
 
-    shutil.move(fname, 'data/redo/done')
+    # shutil.move(fname, 'data/redo/done')

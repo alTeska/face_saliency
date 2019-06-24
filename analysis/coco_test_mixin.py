@@ -25,11 +25,13 @@ MatlabOptions.octave_names = []
 
 path = 'data/redo/results/'
 fnames = glob('data/redo/*.jpg')
+print(fnames)
+
 
 # take care of directories
 directories = ['IK', 'faces',  'aim', 'sun', 'cas', 'covsal', 'gbvs', 'dg',
-'icf', 'ik_face', 'aim_face', 'sun_face', 'cas_face',
-'covsal_face', 'gbvs_face', 'icf_face']
+               'icf', 'ik_face', 'aim_face', 'sun_face', 'cas_face',
+               'covsal_face', 'gbvs_face', 'icf_face']
 
 if not os.path.exists(path):
     os.makedirs(path)
@@ -52,7 +54,9 @@ gbvs = pysaliency.GBVS(location='test_models', cache_location=os.path.join('mode
 
 fnames = fnames[0:2]
 for fname in tqdm(fnames):
-    name = fname[10:-4]  # get just the name of the picture
+    print(fname, '\n')
+
+    name = fname[12:-4]  # get just the name of the picture
     img = mpimg.imread(fname)
 
     pbar = tqdm(total=100)
@@ -122,6 +126,6 @@ for fname in tqdm(fnames):
     save_plot_without_frames(smap_icf_face, path + 'icf_face/' + name + '.jpg')
 
     pbar.update(10)
-    shutil.move(fname, 'data/redo/done')
+    # shutil.move(fname, 'data/redo/done')
 
     pbar.close()

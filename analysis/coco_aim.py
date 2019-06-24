@@ -23,8 +23,9 @@ MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/
 MatlabOptions.octave_names = []
 
 
-path = 'data/imag/results/'
-fnames = glob('data/imag/*.jpg')
+path = 'data/taim/results/'
+fnames = glob('data/taim/*.jpg')
+print(fnames)
 
 # take care of directories
 directories = ['aim', 'aim_face', 'faces', 'done']
@@ -42,7 +43,7 @@ for direct in directories:
 IK = IttiKoch(verbose=False)
 
 # initate models from pysaliency
-aim = pysaliency.AIM(location='test_models', cache_location=os.path.join('model_caches', 'AIM'))
+aim = pysaliency.AIM(location='test_models', caching=False, cache_location=os.path.join('model_caches', 'AIM'))
 
 for fname in tqdm(fnames):
     name = fname[10:-4]  # get just the name of the picture

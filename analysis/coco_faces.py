@@ -17,8 +17,8 @@ plt.rcParams['image.cmap'] = 'gray'
 MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/bin/matlab']
 MatlabOptions.octave_names = []
 
-path = '../data/test2/results/'
-fnames = glob('../data/test2/*.jpg')
+path = './data/face/results/'
+fnames = glob('./data/face/*.jpg')
 
 # take care of directories
 directories = ['faces']
@@ -34,7 +34,7 @@ for direct in directories:
 
 # initiate our model
 params_ik = {
-    "mapwidth": 64,
+    # "mapwidth": 64,
     "gaussian_blur": 10,
     "face_model":'cnn',
 }
@@ -43,15 +43,15 @@ features = ["intensity", "orientation", "color"]
 IK = IttiKoch(input_params=params_ik, verbose=False)
 
 for fname in tqdm(fnames):
-    name = fname[10:-4]  # get just the name of the picture
+    name = fname[12:-4]  # get just the name of the picture
+    print(fname, name)
     img = mpimg.imread(fname)
 
     # run basic models
-    smap_face, _ = IK.run(img, keys = [], faces=True)
+    smap_face, _ = IK.run(img, keys=[], faces=True)
 
     # normalize saliecies
     smap_face = normalize_saliency_map(smap_face)
-    # smap_ik = normalize_saliency_map(smap_ik)
 
     # save plots
     save_plot_without_frames(smap_face, path + 'faces/' + name + '.jpg')

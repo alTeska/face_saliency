@@ -74,6 +74,6 @@ for fname in tqdm(fnames):
     save_plot_without_frames(smap_aim_face, path + 'aim_face/' + name + '.jpg')
     pbar.update(10)
 
-    shutil.move(fname, 'data/imag/done')
+    shutil.move(fname, 'data/done')
 
     pbar.close()

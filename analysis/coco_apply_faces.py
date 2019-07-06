@@ -11,9 +11,9 @@ from utils_analysis import save_plot_without_frames
 
 plt.rcParams['image.cmap'] = 'gray'
 
-path_inp = 'data/redo/'
-path = 'data/redo/results/'
-fnames = glob('data/redo/*.jpg')
+path_inp = './data/redo/'
+path = './data/redo/results/'
+fnames = glob('./data/redo/*.jpg')
 
 # take care of directories
 # directories_inp = ['ik', 'aim', 'sun', 'cas', 'covsal', 'gbvs','icf']
@@ -45,7 +45,7 @@ for direct in directories_out:
 
 
 for fname in tqdm(fnames):
-    name = fname[10:]  # get just the name of the picture
+    name = fname[12:]  # get just the name of the picture
     smap_face = mpimg.imread(fname)
 
     for direct in tqdm(directories_inp):
@@ -74,4 +74,4 @@ for fname in tqdm(fnames):
         save_plot_without_frames(smap_final_05, path + 'face_05/' + direct + '_face/' + name)
         save_plot_without_frames(smap_final_07, path + 'face_07/' + direct + '_face/' + name)
 
-    shutil.move(fname, 'data/redo/done/')
+    shutil.move(fname, './data/redo/done/')

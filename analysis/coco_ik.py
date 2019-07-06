@@ -14,8 +14,8 @@ from utils_analysis import save_plot_without_frames
 warnings.simplefilter(action='ignore', category=FutureWarning)
 plt.rcParams['image.cmap'] = 'gray'
 
-path = '.data/redo/results/'
-fnames = glob('./data/redo/*.jpg')
+path = './data/test/results/'
+fnames = glob('./data/test/*.jpg')
 print(fnames)
 
 # take care of directories
@@ -24,8 +24,8 @@ directories = ['ik']
 if not os.path.exists(path):
     os.makedirs(path)
 
-if not os.path.exists('data/redo/done'):
-    os.makedirs('data/redo/done')
+if not os.path.exists('./data/test/done'):
+    os.makedirs('./data/test/done')
 
 
 for direct in directories:
@@ -36,7 +36,6 @@ for direct in directories:
 
 # initiate our model
 IK = IttiKoch(verbose=False)
-
 
 for fname in tqdm(fnames):
     name = fname[12:-4]  # get just the name of the picture
@@ -52,6 +51,7 @@ for fname in tqdm(fnames):
 
     # save plots
     print('Saving plots')
+    print(path + 'ik/'+ name + '.jpg')
     save_plot_without_frames(smap_ik, path + 'ik/' + name + '.jpg')
 
-    # shutil.move(fname, 'data/redo/done')
+    shutil.move(fname, 'data/test/done')

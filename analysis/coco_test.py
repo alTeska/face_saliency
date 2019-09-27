@@ -18,11 +18,11 @@ plt.rcParams['image.cmap'] = 'gray'
 MatlabOptions.matlab_names = ['matlab', 'matlab.exe', '/usr/local/MATLAB/R2017b/bin/matlab']
 MatlabOptions.octave_names = []
 
-path = 'data/test2/results/'
-fnames = glob('data/test2/*.jpg')
+path = 'data/test3/results/'
+fnames = glob('data/test3/*.jpg')
 
 # take care of directories
-directories = ['IK', 'faces',  'aim', 'sun', 'cas', 'covsal', 'gbvs', 'dg', 'icf']
+directories = ['dg', 'icf']
 
 if not os.path.exists(path):
     os.makedirs(path)
@@ -40,18 +40,18 @@ location = 'test_models'
 location_cache = 'model_caches'
 
 # initate models from pysaliency
-aim = pysaliency.AIM(location=location, caching=False, cache_location=os.path.join(location_cache, 'AIM'))
-sun = pysaliency.SUN(location=location, caching=False, cache_location=os.path.join(location_cache, 'SUN'))
-cas = pysaliency.ContextAwareSaliency(location=location, caching=False, cache_location=os.path.join(location_cache, 'ContextAwareSaliency'))
-covsal = pysaliency.CovSal(location=location, caching=False, cache_location=os.path.join(location_cache, 'CovSal'))
-gbvs = pysaliency.GBVS(location=location, caching=False, cache_location=os.path.join(location_cache, 'GBVS'))
+# aim = pysaliency.AIM(location=location, caching=False, cache_location=os.path.join(location_cache, 'AIM'))
+# sun = pysaliency.SUN(location=location, caching=False, cache_location=os.path.join(location_cache, 'SUN'))
+# cas = pysaliency.ContextAwareSaliency(location=location, caching=False, cache_location=os.path.join(location_cache, 'ContextAwareSaliency'))
+# covsal = pysaliency.CovSal(location=location, caching=False, cache_location=os.path.join(location_cache, 'CovSal'))
+# gbvs = pysaliency.GBVS(location=location, caching=False, cache_location=os.path.join(location_cache, 'GBVS'))
 
 for fname in tqdm(fnames):
     print(fname)
     name = fname[10:-4]  # get just the name of the picture
     img = mpimg.imread(fname)
 
-    pbar = tqdm(total=90)
+    # pbar = tqdm(total=90)
 
     # run basic models
     # smap_ik, _ = IK.run(img)
@@ -67,14 +67,14 @@ for fname in tqdm(fnames):
     # smap_cas = cas.saliency_map(img)
     # pbar.update(10)
     # smap_covsal = covsal.saliency_map(img)
-    # pbar.update(10)
+    # pbar.update(10)https://marketplace.web.cern.ch/t/womens-salomon-ski-boots-40-chf/32717
     # smap_gbvs = gbvs.saliency_map(img)
     # pbar.update(10)
 
     # run deep gaze models
     smap_dg, log_density_prediction = run_deep_gaze(img)
     # pbar.update(10)
-    smap_icf, log_density_prediction_icf = run_deep_gaze(img, model='ICF')
+    # smap_icf, log_density_prediction_icf = run_deep_gaze(img, model='ICF')
     # pbar.update(10)
     #
     #
@@ -86,6 +86,6 @@ for fname in tqdm(fnames):
     # save_plot_without_frames(smap_covsal, path + 'covsal/' + name + '.jpg')
     # save_plot_without_frames(smap_gbvs, path + 'gbvs/' + name + '.jpg')
     save_plot_without_frames(smap_dg, path + 'dg/' + name + '.jpg')
-    save_plot_without_frames(smap_icf, path + 'icf/' + name + '.jpg')
+    # save_plot_without_frames(smap_icf, path + 'icf/' + name + '.jpg')
     #
     # pbar.close()

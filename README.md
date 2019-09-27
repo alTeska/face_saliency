@@ -66,7 +66,7 @@ All of the statistical results are stored in the following folder:
 ## Sample Mean Scores of the Analysis:
 <figure>
 <p align="center">
-    <img src="report/plots/NSS_sep_with_mean.jpg" width="100%">
+    <img src="results/plots/NSS_sep_with_mean.jpg" width="100%">
 </p>
 <figcaption>
 </figcaption><br><br>
@@ -75,7 +75,7 @@ All of the statistical results are stored in the following folder:
 
 <figure>
 <p align="center">
-    <img src="results/plots/face_addition_baby.jpg" width="90%">
+    <img src="results/old_plots/face_addition_baby.jpg" width="90%">
 
 </p>
 <figcaption>

@@ -74,7 +74,7 @@ for fname in tqdm(fnames):
     # run deep gaze models
     smap_dg, log_density_prediction = run_deep_gaze(img)
     # pbar.update(10)
-    # smap_icf, log_density_prediction_icf = run_deep_gaze(img, model='ICF')
+    smap_icf, log_density_prediction_icf = run_deep_gaze(img, model='ICF')
     # pbar.update(10)
     #
     #
@@ -86,6 +86,7 @@ for fname in tqdm(fnames):
     # save_plot_without_frames(smap_covsal, path + 'covsal/' + name + '.jpg')
     # save_plot_without_frames(smap_gbvs, path + 'gbvs/' + name + '.jpg')
     save_plot_without_frames(smap_dg, path + 'dg/' + name + '.jpg')
-    # save_plot_without_frames(smap_icf, path + 'icf/' + name + '.jpg')
-    #
+    save_plot_without_frames(smap_icf, path + 'icf/' + name + '.jpg')
+    shutil.move(fname, './data/redo/done/')
+#
     # pbar.close()

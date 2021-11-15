@@ -48,7 +48,7 @@ numpy-base==1.15.4
 opencv==3.4.2
 openssl==1.1.1a
 pcre==8.42
-pip==18.1
+pip==21.1
 pixman==0.34.0
 py-opencv==3.4.2
 pyparsing==2.3.0

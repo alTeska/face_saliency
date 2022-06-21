@@ -43,7 +43,7 @@ mkl==2019.1
 mkl_fft==1.0.6
 mkl_random==1.0.2
 ncurses==6.1
-numpy==1.15.4
+numpy==1.22.0
 numpy-base==1.15.4
 opencv==3.4.2
 openssl==1.1.1a

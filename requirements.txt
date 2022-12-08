@@ -5,7 +5,7 @@
 # bzip2  # DE
 # ca-certificates==2018.03.07
 pycairo==1.14.12
-certifi==2018.11.29
+certifi==2022.12.7
 cycler==0.10.0
 dbus==1.13.2
 expat==2.2.6
